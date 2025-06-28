@@ -17,10 +17,7 @@ const groups: Group[] = [
 export default function GroupsSidebar() {
   const { groupId } = useParams();
 
-  const handleDeleteGroup = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    group: Group
-  ) => {
+  const handleDeleteGroup = (e: React.MouseEvent<HTMLButtonElement>, group: Group) => {
     e.preventDefault();
     e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete "${group.name}"?`)) {
@@ -36,22 +33,14 @@ export default function GroupsSidebar() {
       >
         Home Page
       </Link>
-      <h2 className="text-gray-900 text-base font-medium leading-normal mb-5">
-        Groups
-      </h2>
+      <h2 className="text-gray-900 text-base font-medium leading-normal mb-5">Groups</h2>
 
       <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
         {groups.map((group) => (
-          <Link
-            key={group.id}
-            to={`/groups/${group.id}`}
-            className="cursor-pointer w-full"
-          >
+          <Link key={group.id} to={`/groups/${group.id}/overview`} className="cursor-pointer w-full">
             <div
               className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
-                parseInt(groupId || "0") === group.id
-                  ? "bg-emerald-600/80 text-white"
-                  : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                parseInt(groupId || "0") === group.id ? "bg-emerald-600/80 text-white" : "bg-gray-100 text-gray-900 hover:bg-gray-200"
               }`}
             >
               {parseInt(groupId || "0") === group.id ? (
@@ -60,12 +49,8 @@ export default function GroupsSidebar() {
                 <HiOutlineUserGroup className="text-md flex-shrink-0" />
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold leading-normal truncate">
-                  {group.name}
-                </p>
-                <p className="text-xs opacity-75 truncate">
-                  {group.students?.length || 0} students
-                </p>
+                <p className="text-sm font-semibold leading-normal truncate">{group.name}</p>
+                <p className="text-xs opacity-75 truncate">{group.students?.length || 0} students</p>
               </div>
               <button
                 onClick={(e) => handleDeleteGroup(e, group)}

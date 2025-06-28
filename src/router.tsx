@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router";
 import HomePage from "./pages/HomePage";
 import GroupsLayout from "./pages/Layouts/GroupsLayout";
+import GroupLayout from "./components/GroupLayout";
+import GroupPlaceholder from "./components/GroupPlaceholder";
 
 export const router = createBrowserRouter([
   {
@@ -13,11 +15,25 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/groups",
-        element: <div>Groups</div>,
+        element: <GroupPlaceholder />,
       },
       {
         path: "/groups/:groupId",
-        element: <div>Group Details</div>,
+        element: <GroupLayout />,
+        children: [
+          {
+            path: "/groups/:groupId/overview",
+            element: <div>Overview</div>,
+          },
+          {
+            path: "/groups/:groupId/reports",
+            element: <div>Reports</div>,
+          },
+          {
+            path: "/groups/:groupId/settings",
+            element: <div>Settings</div>,
+          },
+        ],
       },
     ],
   },
