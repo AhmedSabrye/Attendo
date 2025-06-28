@@ -4,6 +4,8 @@ import GroupsLayout from "./pages/Layouts/GroupsLayout";
 import GroupLayout from "./components/GroupLayout";
 import GroupPlaceholder from "./components/GroupPlaceholder";
 import OverviewTab from "./components/overview tab/Overview";
+import ReportsList from "./components/Reports/ReportsList";
+import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +30,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "/groups/:groupId/reports",
-            element: <div>Reports</div>,
+            element: <ReportsList />,
+          },
+          {
+            path: "/groups/:groupId/reports/:reportId",
+            element: <ReportDetails />,
           },
           {
             path: "/groups/:groupId/settings",
