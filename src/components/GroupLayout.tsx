@@ -3,7 +3,7 @@ import GroupHeader from "./GroupHeader";
 
 export default function GroupLayout() {
   return (
-    <div>
+    <div className="p-4 h-full">
       <GroupHeader />
       <Outlet />
     </div>

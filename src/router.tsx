@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import GroupsLayout from "./pages/Layouts/GroupsLayout";
 import GroupLayout from "./components/GroupLayout";
 import GroupPlaceholder from "./components/GroupPlaceholder";
+import OverviewTab from "./components/overview tab/Overview";
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "/groups/:groupId/overview",
-            element: <div>Overview</div>,
+            element: <OverviewTab />,
           },
           {
             path: "/groups/:groupId/reports",
