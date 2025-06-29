@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { HiUserGroup, HiPlus, HiTrash, HiArrowLeft } from "react-icons/hi2";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useParams } from "react-router";
+import CreateGroupModal from "./CreateGroupModal";
 
 interface Group {
   id: number;
@@ -17,6 +18,7 @@ const groups: Group[] = [
 export default function GroupsSidebar() {
   const { groupId } = useParams();
 
+  const [isOpen, setIsOpen] = useState(false);
   const handleDeleteGroup = (e: React.MouseEvent<HTMLButtonElement>, group: Group) => {
     e.preventDefault();
     e.stopPropagation();
@@ -64,10 +66,22 @@ export default function GroupsSidebar() {
         ))}
       </div>
 
-      <button className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer mt-4 bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors">
+      <button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer mt-4 bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+      >
         <HiPlus className="text-2xl" />
         <p className="text-sm font-medium leading-normal">Add Group</p>
       </button>
+      {isOpen && (
+        <CreateGroupModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onCreateGroup={() => {
+            console.log("group created");
+          }}
+        />
+      )}
     </div>
   );
 }
