@@ -15,7 +15,7 @@ const tabs: Tab[] = [
   { id: "settings", label: "Settings", to: "/groups/:groupId/settings", icon: <HiDocumentArrowUp /> },
 ];
 
-export default function GroupHeader() {
+export default function GroupHeader({ onAttendanceSheetModalOpen }: { onAttendanceSheetModalOpen: () => void }) {
   // const tabId = useLocation().pathname.split("/").pop();
   const { groupId } = useParams();
 
@@ -38,7 +38,7 @@ export default function GroupHeader() {
             </NavLink>
           ))}
           {
-            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-auto my-2">
+            <button onClick={onAttendanceSheetModalOpen} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors ml-auto my-2">
               <HiDocumentArrowUp className="text-lg" />
               Take Attendance
             </button>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { HiUserGroup, HiPlus, HiTrash, HiArrowLeft } from "react-icons/hi2";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useParams } from "react-router";
-import CreateGroupModal from "./CreateGroupModal";
+import CreateGroupModal from "./modals/CreateGroupModal";
 
 interface Group {
   id: number;
