@@ -6,12 +6,22 @@ import GroupPlaceholder from "./components/GroupPlaceholder";
 import OverviewTab from "./components/overview tab/Overview";
 import ReportsList from "./components/Reports/ReportsList";
 import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
   },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />,
+  },  
   {
     path: "/groups",
     element: <GroupsLayout />,

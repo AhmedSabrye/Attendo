@@ -1,9 +1,7 @@
 import { HiUserGroup, HiClipboardDocumentList, HiArrowRight } from "react-icons/hi2";
 import { Link } from "react-router";
-import AttendanceSheetModal from "../components/modals/AttendanceSheetModal/AttendanceSheetModal";
 
 export default function HomePage() {
-  console.log("HomePage");
 
   return (
     <div className="min-h-screen bg-gray-50">
