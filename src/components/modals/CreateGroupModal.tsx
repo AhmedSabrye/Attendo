@@ -124,7 +124,7 @@ export default function CreateGroupModal({
         {/* Day Selection */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Select Days</label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 justify-center">
             {days.map((day) => (
               <button
                 key={day.full}

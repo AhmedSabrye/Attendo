@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router";
 import HomePage from "./pages/HomePage";
 import GroupsLayout from "./pages/Layouts/GroupsLayout";
-import GroupLayout from "./components/GroupLayout";
 import GroupPlaceholder from "./components/GroupPlaceholder";
 import OverviewTab from "./components/overview tab/Overview";
 import ReportsList from "./components/Reports/ReportsList";
 import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import GroupLayout from "./pages/Layouts/GroupLayout";
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupPage />,
-  },  
+  },
   {
     path: "/groups",
     element: <GroupsLayout />,
