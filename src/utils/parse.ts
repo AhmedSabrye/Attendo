@@ -9,12 +9,16 @@ export interface ComparisonRecord extends AttendanceRecord {
   studentId: number;
   attendance_alias?: string | null;
 }
+export interface SessionReport {
+  comparison: ComparisonRecord[];
+  notMatchedStudents: AttendanceRecord[];
+  absentStudents: Student[];
+}
 export interface ValidationReport {
   isValid: boolean;
   summary: {
     totalStudents: number;
-    validRecords: number;
-    recordsWithIds: number;
+    attendedStudents: number;
     averageDuration: number;
     absentStudents: number;
   };
@@ -22,7 +26,6 @@ export interface ValidationReport {
     nameColumn?: string;
     durationColumn?: string;
   };
-  warnings: string[];
 }
 
 import Papa from "papaparse";
@@ -152,14 +155,14 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
       existingRecord.duration = existingRecord.duration + duration;
       continue;
     }
-    
+
     parsed.push({
       studentName,
       phoneId,
       duration,
     });
   }
-  
+
   return parsed;
 }
 // this one will compare the students in the group with the students in the attendance sheet
@@ -171,7 +174,7 @@ export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecor
   groupStudentsCopy.forEach((student, groupIndex) => {
     attendanceSheetCopy.forEach((record, index) => {
       // Convert phone numbers to 3-digit strings with leading zeros for comparison
-      const studentPhone = student.phone_last_3.padStart(3, "0");
+      const studentPhone = student.phone_last_3?.padStart(3, "0") ?? "";
       const recordPhone = record.phoneId ? String(record.phoneId).padStart(3, "0") : null;
 
       const phoneMatch = recordPhone === studentPhone;
@@ -179,7 +182,6 @@ export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecor
       // console.table({phoneMatch, aliasMatch, recordPhone, studentPhone, studentName: student.name, recordName: record.studentName});
       // if the student has 3 digits id and not duplication, take the name of it to make it attendance_alias
       if (!duplicatesIdxs.includes(recordPhone!)) {
-        
         // the normal flow, if the phone matches or the alias matches, we add the record to the comparison
         if (phoneMatch || aliasMatch) {
           const existingRecord = comparison.find((c) => c.studentName === student.name);
@@ -203,75 +205,14 @@ export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecor
           groupStudentsCopy[groupIndex].isMatched = true;
         }
       }
-      
     });
   });
 
   const absentStudents = groupStudentsCopy.filter((student) => !student.isMatched || student.isAbsent);
-  
+
   return { comparison, notMatchedStudents: attendanceSheetCopy, absentStudents: absentStudents };
 }
 
-export function generateValidationReport(
-  sessionReport: { comparison: ComparisonRecord[]; notMatchedStudents: AttendanceRecord[]; absentStudents: Student[] },
-  groupStudents: Student[]
-): ValidationReport {
-  const warnings: string[] = [];
-  const { comparison, notMatchedStudents, absentStudents } = sessionReport;
-
-  const totalStudents = groupStudents.length;
-  const validRecords = comparison.length;
-  const totalDuration = comparison.reduce((sum, record) => sum + record.duration, 0);
-  //todo: change this field
-  const recordsWithIds = comparison.filter((record) => record.phoneId !== null).length;
-
-  //todo: phoneId duplication should be in parsing phase
-  const phoneIdCount: Record<string, number> = {};
-  comparison.forEach((record) => {
-    if (record.phoneId !== null) {
-      const phoneIdStr = record.phoneId.toString();
-      phoneIdCount[phoneIdStr] = (phoneIdCount[phoneIdStr] || 0) + 1;
-    }
-  });
-
-  // Duplicate analysis
-  const duplicatePhoneIds = Object.keys(phoneIdCount).filter((id) => phoneIdCount[id] > 1);
-  const duplicateNames = comparison
-    .filter((record) => record.phoneId !== null && duplicatePhoneIds.includes(record.phoneId.toString()))
-    .map((record) => record.studentName);
-
-  if (duplicatePhoneIds.length > 0) {
-    warnings.push(`Duplicate phone IDs found: ${duplicatePhoneIds.join(", ")}`);
-  }
-
-  if (notMatchedStudents.length > 0) {
-    warnings.push(`${notMatchedStudents.length} students from attendance sheet could not be matched`);
-  }
-
-  if (duplicateNames.length > 0) {
-    warnings.push(`Duplicate names found: ${duplicateNames.join(", ")}`);
-  }
-
-  const averageDuration = validRecords > 0 ? Math.round(totalDuration / validRecords) : 0;
-
-  const report: ValidationReport = {
-    isValid: warnings.length === 0,
-    summary: {
-      totalStudents,
-      validRecords: comparison.length,
-      recordsWithIds,
-      averageDuration,
-      absentStudents: absentStudents.length,
-    },
-    columnDetection: {
-      nameColumn: "Name (auto-detected)",
-      durationColumn: "Duration (auto-detected)",
-    },
-    warnings,
-  };
-
-  return report;
-}
 
 // this function is used to normalize the digits if someone wrote his numbers in arabic
 function normalizeDigits(input: string) {

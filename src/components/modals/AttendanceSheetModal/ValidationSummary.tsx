@@ -14,19 +14,43 @@ export default function ValidationSummary({ report, absentStudents, notMatchedSt
   const hasErrors = absentStudents.length > 0 || notMatchedStudents.length > 0;
   const totalUnmatched = absentStudents.length + notMatchedStudents.length;
 
-
   return (
     <div className="bg-white border rounded-lg p-4">
       {/* Summary Statistics */}
       <div className="grid grid-cols-4 gap-3 mb-4">
-        <SummaryCard title="Total Students" value={report.summary.totalStudents} icon={<FiUsers className="text-blue-600" size={30} />} textColor="text-blue-600" bgColor="bg-blue-50" textColor2="text-blue-600" />
-        <SummaryCard title="Attended" value={report.summary.validRecords} icon={<BsPersonRaisedHand  className="text-green-600" size={30} />} textColor="text-green-600" bgColor="bg-green-50" textColor2="text-green-600" />
-        <SummaryCard title="Absent" value={report.summary.absentStudents} icon={<MdOutlinePersonOff  className="text-red-600" size={30} />} textColor="text-red-600" bgColor="bg-red-50" textColor2="text-red-600" />
-        <SummaryCard title="Avg Duration" value={report.summary.averageDuration} icon={<FiClock className="text-purple-600" size={30} />} textColor="text-purple-600" bgColor="bg-purple-50" textColor2="text-purple-600" />
+        <SummaryCard
+          title="Total Students"
+          value={report.summary.totalStudents}
+          icon={<FiUsers className="text-blue-600" size={30} />}
+          textColor="text-blue-600"
+          bgColor="bg-blue-50"
+          textColor2="text-blue-600"
+        />
+        <SummaryCard
+          title="Attended"
+          value={report.summary.attendedStudents}
+          icon={<BsPersonRaisedHand className="text-green-600" size={30} />}
+          textColor="text-green-600"
+          bgColor="bg-green-50"
+          textColor2="text-green-600"
+        />
+        <SummaryCard
+          title="Absent"
+          value={report.summary.absentStudents}
+          icon={<MdOutlinePersonOff className="text-red-600" size={30} />}
+          textColor="text-red-600"
+          bgColor="bg-red-50"
+          textColor2="text-red-600"
+        />
+        <SummaryCard
+          title="Avg Duration"
+          value={report.summary.averageDuration}
+          icon={<FiClock className="text-purple-600" size={30} />}
+          textColor="text-purple-600"
+          bgColor="bg-purple-50"
+          textColor2="text-purple-600"
+        />
       </div>
-
-
-
 
       {/* Warnings Alert */}
       {hasErrors && (
@@ -46,8 +70,21 @@ export default function ValidationSummary({ report, absentStudents, notMatchedSt
   );
 }
 
-
-const SummaryCard = ({ title, value, icon, textColor ,bgColor, textColor2}: { title: string; value: number; icon: React.ReactNode, textColor: string, bgColor: string, textColor2: string }) => {
+const SummaryCard = ({
+  title,
+  value,
+  icon,
+  textColor,
+  bgColor,
+  textColor2,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  textColor: string;
+  bgColor: string;
+  textColor2: string;
+}) => {
   return (
     <div className={`rounded-lg p-3 flex items-center gap-2 ${bgColor}`}>
       {icon}

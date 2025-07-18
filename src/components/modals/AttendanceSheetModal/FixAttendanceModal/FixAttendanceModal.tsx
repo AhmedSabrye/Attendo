@@ -1,14 +1,9 @@
 import { useMemo, useState, useRef } from "react";
 import { FiX, FiCheck } from "react-icons/fi";
-import {
-  generateValidationReport,
-  type AttendanceRecord,
-} from "../../../../utils/parse";
-import type { Student } from "../../../../utils/api";
-import type {
-  ComparisonRecord,
-  ValidationReport,
-} from "../../../../utils/parse";
+import { type AttendanceRecord } from "@/utils/parse";
+import { generateValidationReport } from "@/utils/generateValidationReport";
+import type { Student } from "@/utils/api";
+import type { ComparisonRecord, ValidationReport } from "@/utils/parse";
 import { distance } from "fastest-levenshtein";
 import SearchInput from "./searchInput";
 
