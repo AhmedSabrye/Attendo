@@ -56,21 +56,21 @@ export default function GroupLayout() {
       className={`md:p-4 p-2 ${sidebarOpen ? "overflow-hidden h-screen" : ""}`}
     >
       <GroupHeader
-      
         onAttendanceSheetModalOpen={onOpenAttendanceSheetModal}
+        onTemplateManagerModalOpen={onOpenTemplateManagerModal}
       />
       <Outlet key={groupId} />
       {/* modals */}
       {modal === 2 && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          {/* <AttendanceSheetModal onClose={onCloseModal} /> */}
+          <AttendanceSheetModal onClose={onCloseModal} />
         </div>
       )}
       {modal === 1 && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          {/* <TemplateManager
+          <TemplateManager
             onClose={onCloseModal}
-          /> */}
+          />
         </div>
       )}
       {createGroupModalOpen && (

@@ -1,5 +1,5 @@
 import React from "react";
-import { FiUpload, FiInfo } from "react-icons/fi";
+import { FiUpload } from "react-icons/fi";
 
 interface UploadAreaProps {
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -8,7 +8,7 @@ interface UploadAreaProps {
 const UploadArea: React.FC<UploadAreaProps> = ({ onFileSelect }) => {
   return (
     <div className="mb-6">
-      <div className="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-gray-300 hover:border-gray-400">
+      <div className="border-2 border-dashed rounded-lg p-8  text-center transition-colors border-gray-300 hover:border-gray-400">
         <FiUpload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <div className="mb-4">
           <h3 className="text-lg font-medium text-gray-900 mb-2">Upload your CSV file</h3>
@@ -24,7 +24,7 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onFileSelect }) => {
       </div>
 
       {/* Format Instructions */}
-      <div className="mt-4 bg-blue-50 rounded-lg p-4">
+      {/* <div className="mt-4 bg-blue-50 rounded-lg p-4">
         <div className="flex items-start gap-2">
           <FiInfo className="text-blue-600 mt-0.5" />
           <div className="text-sm text-blue-700">
@@ -37,7 +37,7 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onFileSelect }) => {
             </ul>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
