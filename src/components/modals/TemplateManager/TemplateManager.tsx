@@ -10,9 +10,7 @@ interface TemplateManagerProps {
   onClose: () => void;
 }
 export interface ParsedStudent extends Pick<Student, "name" | "phone_last_3" | "order_index"> {}
-export interface OrderUpdate extends ParsedStudent {
-  student_id: number;
-}
+export interface OrderUpdate extends Pick<Student, "student_id" | "name" | "phone_last_3" | "order_index"> {}
 
 const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const [template, setTemplate] = useState("");
@@ -33,23 +31,22 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const diff = useMemo(() => {
     const key = (name: string, phoneLast3: string | number | null) => `${name.trim().toLowerCase()}|${String(phoneLast3).slice(-3)}`;
 
-    const currentSet = new Set(students.map((s) => key(s.name, s.phone_last_3)));
-    const incomingSet = new Set(parsed.map((p) => key(p.name, p.phone_last_3)));
-
-    const toAdd = parsed.filter((p) => !currentSet.has(key(p.name, p.phone_last_3)));
-    const toRemove = students.filter((s) => !incomingSet.has(key(s.name, s.phone_last_3)));
-    const toReactivate = students.filter((s) => !s.is_active && incomingSet.has(key(s.name, s.phone_last_3)));
+    const currentSet = new Set(students.map((s) => key(s.name, s.phone_last_3?.trim() ?? "")));
+    const incomingSet = new Set(parsed.map((p) => key(p.name, p.phone_last_3?.trim() ?? "")));
+    const toAdd = parsed.filter((p) => !currentSet.has(key(p.name, p.phone_last_3?.trim() ?? "")));
+    const toRemove = students.filter((s) => !incomingSet.has(key(s.name, s.phone_last_3?.trim() ?? "")));
+    const toReactivate = students.filter((s) => !s.is_active && incomingSet.has(key(s.name, s.phone_last_3?.trim() ?? "")));
 
     // Determine order updates for existing students
-    const parsedMap = new Map(parsed.map((p) => [key(p.name, p.phone_last_3), p]));
+    const parsedMap = new Map(parsed.map((p) => [key(p.name, p.phone_last_3 ?? ""), p]));
     const orderUpdates: OrderUpdate[] = students
       .map((s) => {
-        const match = parsedMap.get(key(s.name, s.phone_last_3));
+        const match = parsedMap.get(key(s.name, s.phone_last_3?.trim() ?? ""));
         if (match && s.order_index !== match.order_index) {
           return {
             student_id: s.student_id,
             name: s.name,
-            phone_last_3: s.phone_last_3,
+            phone_last_3: s.phone_last_3 ?? "",
             order_index: match.order_index,
           };
         }
