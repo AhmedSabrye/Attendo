@@ -113,6 +113,7 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
     }
   }
 
+  // handle
   if (headerRowIndex === -1 || nameColumnIndex === -1) {
     console.error("Could not find header row or name column");
     return [];
@@ -131,7 +132,11 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
     // Get duration - try the detected duration column first, then fallback to common positions
     let duration = 0;
     if (durationColumnIndex !== -1 && row[durationColumnIndex]) {
-      duration = parseInt(row[durationColumnIndex], 10);
+      // if the duration is not a number, make it 0, and must be positive number
+      let duration = parseInt(row[durationColumnIndex], 10) || 0;
+      if (duration < 0) {
+        duration = 0;
+      }
     }
 
     // Extract phone ID as the last sequence of 3+ digits in the name
