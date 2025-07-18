@@ -6,6 +6,7 @@ import { handleRpcCall } from "./helpers";
 export const userApi = {
   // Get or create current user
   async getCurrentUser(authUser: any): Promise<User | null> {
+    if (!authUser) return null;
     try {
       return await handleRpcCall<User>("get_or_create_user", {
         p_auth_user_id: authUser.id, // Supabase automatically handles UUID conversion
