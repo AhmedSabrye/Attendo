@@ -35,9 +35,10 @@ export default function SignupPage() {
 
     try {
       await signUp({ email, password, username }).unwrap();
+      console.log("signup success");
       navigate("/groups");
-    } catch (err) {
-      setError(err as string);
+    } catch (err: any) {
+      setError(err?.message);
     } finally {
       setLoading(false);
     }
