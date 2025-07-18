@@ -1,5 +1,5 @@
 import React from "react";
-import { HiUserGroup, HiPlus, HiTrash, HiArrowRightOnRectangle } from "react-icons/hi2";
+import { HiUserGroup, HiPlus, HiTrash, HiArrowRightOnRectangle, HiXMark } from "react-icons/hi2";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useParams, useNavigate } from "react-router";
 import type { Group } from "../utils/api";
@@ -52,12 +52,12 @@ export default function GroupsSidebar() {
         }`}
       ></div>
       <div
-        className={`flex min-h-screen flex-col fixed md:static z-50 top-0 right-0 left-0 bottom-0 sm:bottom-auto sm:right-auto transition duration-500 md:translate-x-0 bg-white lg:relative min-w-64 p-4 shadow-md ${
+        className={`flex min-h-screen flex-col fixed md:static z-50 top-0 right-0 left-0 bottom-0 sm:bottom-auto sm:right-auto transition duration-500 md:translate-x-0 bg-white lg:relative min-w-64 px-4 py-8 shadow-md ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full "
         }`}
       >
-        <button onClick={() => dispatch(toggleSidebar())} className="text-gray-500 md:hidden hover:text-gray-700">
-          <HiMenu className="text-2xl" />
+        <button onClick={() => dispatch(toggleSidebar())} className="text-gray-500 md:hidden absolute top-2 right-2 hover:text-gray-700">
+          <HiXMark className="text-2xl" />
         </button>
         <div className="mb-5">
           <Link
