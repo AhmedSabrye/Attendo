@@ -6,7 +6,6 @@ import type { Group } from "../utils/api";
 import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { useSignOutMutation } from "@/stores/auth.slice";
 import { toggleCreateGroupModal, toggleSidebar } from "@/stores/modals";
-import { HiMenu } from "react-icons/hi";
 import { useDeleteGroupMutation, useGetGroupsQuery } from "@/stores/api";
 
 export default function GroupsSidebar() {

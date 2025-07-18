@@ -6,7 +6,6 @@ import {
 } from "@/utils/api";
 import { useMemo } from "react";
 import { HiCheck, HiXMark } from "react-icons/hi2";
-import { Link } from "react-router-dom";
 import type { SelectedStudent } from "./Overview";
 
 interface OverviewTable {
@@ -22,7 +21,6 @@ export default function OverviewTable({
   attendance,
   totalSessions,
   students,
-  groupId,
   reports,
   handleSelectingStudent,
 }: OverviewTable) {
