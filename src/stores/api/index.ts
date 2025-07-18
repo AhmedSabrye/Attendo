@@ -1,23 +1,28 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { userEndpoints } from "./userEndpoints";
 import { groupEndpoints } from "./groupEndpoints";
 import { studentEndpoints } from "./studentEndpoints";
-import { userEndpoints } from "./userEndpoints";
+import { attendanceEndpoints } from "./attendanceEndpoints";
+import { reportEndpoints } from "./reportEndpoints";
 
 export const attendanceApi = createApi({
   reducerPath: "attendanceApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["Group"],
+  tagTypes: ["User", "Group", "Student", "Attendance", "Report"],
   endpoints: (builder) => ({
+    // Combine all endpoints from different modules
+    ...userEndpoints(builder),
     ...groupEndpoints(builder),
     ...studentEndpoints(builder),
-    ...userEndpoints(builder),
+    ...attendanceEndpoints(builder),
+    ...reportEndpoints(builder),
   }),
 });
 
 export const {
-    // User hooks
-    useGetCurrentUserQuery,
-    useUpdateUserMutation,
+  // User hooks
+  useGetCurrentUserQuery,
+  useUpdateUserMutation,
 
   // Group hooks
   useGetGroupsQuery,
@@ -26,7 +31,6 @@ export const {
   useUpdateGroupMutation,
   useUpdateGroupDuplicatedIndicesMutation,
   useDeleteGroupMutation,
-
 
   // Student hooks
   useGetStudentsQuery,
@@ -37,7 +41,15 @@ export const {
   useSyncStudentsMutation,
   useDeleteStudentMutation,
 
+  // Attendance hooks
+  useGetAttendanceQuery,
+  useGetAttendanceByGroupQuery,
+  useGetAttendanceByDateQuery,
+  useBulkUpdateAttendanceMutation,
+  useUpdateAttendanceMutation,
 
-
-
+  // Reports hooks
+  useGetReportByIdQuery,
+  useGetAllReportsForGroupQuery,
+  useGetReportsForDateRangeQuery,
 } = attendanceApi;
