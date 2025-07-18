@@ -2,8 +2,7 @@ import { HiCheck, HiX } from "react-icons/hi";
 
 export default function OverviewLegend() {
   return (
-    <div className="px-6 pb-6">
-      <div className="flex items-center gap-6 text-sm">
+    <div className="px-6 pb-6 hidden md:flex gap-4 items-center">
         <span className="text-gray-600 font-medium">Legend:</span>
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-50 text-green-600">
@@ -23,7 +22,6 @@ export default function OverviewLegend() {
           </div>
           <span className="text-gray-600">Absent</span>
         </div>
-      </div>
     </div>
   );
 }
