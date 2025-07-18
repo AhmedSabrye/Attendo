@@ -8,6 +8,7 @@ import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import GroupLayout from "./pages/Layouts/GroupLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -24,10 +25,15 @@ export const router = createBrowserRouter([
   },
   {
     path: "/groups",
-    element: <GroupsLayout />,
+    element: (
+      <ProtectedRoute>
+        <GroupsLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "/groups",
+
         element: <GroupPlaceholder />,
       },
       {

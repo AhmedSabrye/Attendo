@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useSignInMutation } from "@/stores/auth.slice";
 import { HiClipboardDocumentList, HiEye, HiEyeSlash } from "react-icons/hi2";
+import { useGetGroupsQuery } from "@/stores/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { refetch } = useGetGroupsQuery();
 
   const [signIn] = useSignInMutation();
   const navigate = useNavigate();
@@ -20,9 +22,10 @@ export default function LoginPage() {
 
     try {
       await signIn({ email, password }).unwrap();
+      await refetch();
       navigate("/groups");
     } catch (err) {
-      setError(err as string);
+      setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
