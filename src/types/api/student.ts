@@ -3,7 +3,7 @@ export type Student = {
   group_id: number;
   name: string;
   attendance_alias?: string | null;
-  phone_last_3: string;
+  phone_last_3?: string;
   is_active: boolean;
   order_index?: number;
   created_at: string;

@@ -1,18 +1,6 @@
 import type { EndpointBuilder } from "@reduxjs/toolkit/query/react";
 import supabaseApi, { type Student } from "../../utils/api";
-
-// temporary types
-interface OrderUpdate {
-  student_id: number;
-  new_position: number;
-}
-
-interface ParsedStudent {
-  student_id: number;
-  name: string;
-  status: "active" | "inactive";
-  position: number;
-}
+import type { OrderUpdate, ParsedStudent } from "../../components/modals/TemplateManager/TemplateManager";
 
 export const studentEndpoints = (builder: EndpointBuilder<any, any, any>) => ({
   // ==================== STUDENT ENDPOINTS ====================
