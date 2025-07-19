@@ -3,17 +3,17 @@ import { FiX, FiCheck } from "react-icons/fi";
 import { type AttendanceRecord } from "@/utils/parse";
 import { generateValidationReport } from "@/utils/generateValidationReport";
 import type { Student } from "@/utils/api";
-import type { ComparisonRecord, ValidationReport } from "@/utils/parse";
+import type { ComparisonRecord, FinalComparisonRecord, ValidationReport } from "@/utils/parse";
 import { distance } from "fastest-levenshtein";
 import SearchInput from "./searchInput";
 
 interface FixAttendanceModalProps {
-  absentStudents: Student[];
+  absentStudents: FinalComparisonRecord[];
   notMatchedStudents: AttendanceRecord[];
   comparison: ComparisonRecord[];
   onDone: (
     updatedComparison: ComparisonRecord[],
-    remainingAbsent: Student[],
+    remainingAbsent: FinalComparisonRecord[],
     remainingUnmatched: AttendanceRecord[]
   ) => void;
   onClose: () => void;
@@ -22,7 +22,7 @@ interface FixAttendanceModalProps {
 }
 
 interface AssignedMatch {
-  student: Student;
+  student: FinalComparisonRecord;
   unmatchedRecords: AttendanceRecord[];
   totalDuration: number;
 }
@@ -37,9 +37,9 @@ function FixAttendanceModal({
   groupStudents,
 }: FixAttendanceModalProps) {
   // Local working copies so we don't mutate props directly
-  const [localAbsent, setLocalAbsent] = useState<Student[]>(
+  const [localAbsent, setLocalAbsent] = useState<FinalComparisonRecord[]>(
     [...absentStudents].sort((a, b) =>
-      (a.name ?? "").localeCompare(b.name ?? "")
+      (a.studentName ?? "").localeCompare(b.studentName ?? "")
     )
   );
   const [localUnmatched, setLocalUnmatched] = useState<AttendanceRecord[]>(
@@ -137,7 +137,7 @@ function FixAttendanceModal({
   const handleAssign = () => {
     if (selectedStudentId == null || selectedUnmatchedIdxs.size === 0) return;
 
-    const student = localAbsent.find((s) => s.student_id === selectedStudentId);
+    const student = localAbsent.find((s) => s.studentId === selectedStudentId);
     if (!student) return;
 
     // Get selected unmatched records
@@ -163,15 +163,15 @@ function FixAttendanceModal({
     // Add / update comparison record for this student
     setLocalComparison((prev) => {
       const existingIdx = prev.findIndex(
-        (c) => c.studentId === student.student_id
+        (c) => c.studentId === student.studentId
       );
       const newEntry: AttendanceRecord & {
         studentId: number;
         attendance_alias?: string | null;
       } = {
-        studentName: student.name ?? "",
-        studentId: student.student_id,
-        phoneId: student.phone_last_3 ?? null,
+        studentName: student.studentName ?? "",
+        studentId: student.studentId,
+        phoneId: student.phoneId ?? null,
         duration: totalDuration + (prev[existingIdx]?.duration || 0),
         attendance_alias:
           student.attendance_alias ?? selectedRecords[0].studentName,
@@ -186,7 +186,7 @@ function FixAttendanceModal({
 
     // Remove the student from absent list
     setLocalAbsent((prev) =>
-      prev.filter((s) => s.student_id !== student.student_id)
+      prev.filter((s) => s.studentId !== student.studentId)
     );
 
     // Remove selected unmatched rows
@@ -201,6 +201,7 @@ function FixAttendanceModal({
     // Clear search inputs after assign
     setAbsentSearch("");
     setUnmatchedSearch("");
+    similarNames.current = new Set();
   };
 
   const handleUndoMatch = (matchIndex: number) => {
@@ -210,7 +211,7 @@ function FixAttendanceModal({
     // Add student back to absent list
     setLocalAbsent((prev) =>
       [...prev, matchToUndo.student].sort((a, b) =>
-        (a.name ?? "").localeCompare(b.name ?? "")
+        (a.studentName ?? "").localeCompare(b.studentName ?? "")
       )
     );
 
@@ -224,7 +225,7 @@ function FixAttendanceModal({
     // Update comparison - subtract this student's duration or remove entirely
     setLocalComparison((prev) => {
       const existingIdx = prev.findIndex(
-        (c) => c.studentId === matchToUndo.student.student_id
+        (c) => c.studentId === matchToUndo.student.studentId
       );
       if (existingIdx !== -1) {
         const existing = prev[existingIdx];
@@ -316,35 +317,35 @@ function FixAttendanceModal({
                 .filter(
                   (student) =>
                     absentSearch.trim() === "" ||
-                    (student.name ?? "")
+                    (student.studentName ?? "")
                       .toLowerCase()
                       .includes(absentSearch.toLowerCase())
                 )
-                .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+                .sort((a, b) => (a.studentName ?? "").localeCompare(b.studentName ?? ""))
                 .map((student) => (
                   <label
-                    key={student.student_id}
+                    key={student.studentId}
                     className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-50"
                   >
                     <input
                       type="radio"
                       name="absentStudent"
-                      value={student.student_id}
-                      checked={selectedStudentId === student.student_id}
+                      value={student.studentId}
+                      checked={selectedStudentId === student.studentId}
                       onChange={() =>
-                        handleSelectStudent(student.student_id, student.name)
+                        handleSelectStudent(student.studentId, student.studentName ?? "")
                       }
                     />
-                    <span>{student.name}</span>
+                    <span>{student.studentName}</span>
                     <span className="text-xs text-gray-400 ml-auto">
-                      {student.phone_last_3}
+                      {student.phoneId}
                     </span>
                   </label>
                 ))}
               {localAbsent.filter(
                 (student) =>
                   absentSearch.trim() === "" ||
-                  (student.name ?? "")
+                  (student.studentName ?? "")
                     .toLowerCase()
                     .includes(absentSearch.toLowerCase())
               ).length === 0 && (
@@ -423,10 +424,10 @@ function FixAttendanceModal({
             selectedUnmatchedIdxs.size > 0 &&
             `Assigning ${totalSelectedDuration} minutes to ${
               (
-                localAbsent.find((s) => s.student_id === selectedStudentId) || {
-                  name: "",
+                localAbsent.find((s) => s.studentId === selectedStudentId) || {
+                  studentName: "",
                 }
-              ).name
+              ).studentName
             }`}
         </p>
 
@@ -444,7 +445,7 @@ function FixAttendanceModal({
                 >
                   <div className="flex-1 text-sm">
                     <div className="font-medium text-green-800 mb-1">
-                      {match.student.name}
+                      {match.student.studentName}
                     </div>
                     <div className="text-gray-600 text-xs mb-1">
                       ←{" "}

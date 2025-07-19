@@ -16,13 +16,9 @@ export function generateValidationReport(
     isValid: true,
     summary: {
       totalStudents,
-      attendedStudents: totalStudents - absentStudents.length,
+      attendedStudents: totalStudents - absentStudents.length || 0,
       averageDuration,
       absentStudents: absentStudents.length,
-    },
-    columnDetection: {
-      nameColumn: "Name (auto-detected)",
-      durationColumn: "Duration (auto-detected)",
     },
   };
   return report;

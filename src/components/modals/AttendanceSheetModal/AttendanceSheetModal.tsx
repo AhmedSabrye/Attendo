@@ -4,8 +4,7 @@ import UploadArea from "./UploadArea";
 import ValidationSummary from "./ValidationSummary";
 import { parseAttendanceSheet, generateSessionAttendanceReport } from "@/utils/parse";
 import { generateValidationReport } from "@/utils/generateValidationReport";
-import type { AttendanceRecord, ValidationReport } from "@/utils/parse";
-import type { Student } from "@/utils/api";
+import type { AttendanceRecord, FinalComparisonRecord, ValidationReport } from "@/utils/parse";
 import FixAttendanceModal from "./FixAttendanceModal/FixAttendanceModal";
 import ActionButtons from "./ActionButtons";
 import FileInfo from "./FileInfo";
@@ -17,13 +16,8 @@ function AttendanceSheetModal({ onClose }: { onClose: () => void }) {
   const { bulkUpdateAttendance, activeGroupStudents, groupData, file, setFile, groupId } = useAttendanceSheetModal();
 
   const [validationReport, setValidationReport] = useState<ValidationReport | null>(null);
-  const [comparison, setComparison] = useState<
-    (AttendanceRecord & {
-      studentId: number;
-      attendance_alias?: string | null;
-    })[]
-  >([]);
-  const [absentStudents, setAbsentStudents] = useState<Student[]>([]);
+  const [comparison, setComparison] = useState<FinalComparisonRecord[]>([]);
+  const [absentStudents, setAbsentStudents] = useState<FinalComparisonRecord[]>([]);
   const [notMatchedStudents, setNotMatchedStudents] = useState<AttendanceRecord[]>([]);
   const [error, setError] = useState(null);
   const [showFixModal, setShowFixModal] = useState(false);
@@ -52,6 +46,7 @@ function AttendanceSheetModal({ onClose }: { onClose: () => void }) {
     const validationReport = generateValidationReport(generatedSessionReport, activeGroupStudents ?? []);
     setValidationReport(validationReport);
 
+    console.log("generatedSessionReport", generatedSessionReport);
     setComparison(generatedSessionReport.comparison);
     setAbsentStudents(generatedSessionReport.absentStudents);
     setNotMatchedStudents(generatedSessionReport.notMatchedStudents);
@@ -65,12 +60,12 @@ function AttendanceSheetModal({ onClose }: { onClose: () => void }) {
 
     //refactor , do we need to check the comparison again ?
     const bulkData = activeGroupStudents?.map((student) => {
-      const comparisondRecord = comparison.find((c) => c.studentId === student.student_id);
+      const comparisonedRecord = comparison.find((c) => c.studentId === student.student_id);
       return {
         student_id: student.student_id,
-        duration_minutes: comparisondRecord?.duration || 0,
-        attended: (comparisondRecord?.duration || 0) >= 40,
-        attendance_alias: comparisondRecord?.attendance_alias == student.attendance_alias ? null : comparisondRecord?.attendance_alias,
+        duration_minutes: comparisonedRecord?.duration || 0,
+        attended: (comparisonedRecord?.duration || 0) >= 40,
+        attendance_alias: comparisonedRecord?.attendance_alias == student.attendance_alias ? null : comparisonedRecord?.attendance_alias,
       };
     });
 

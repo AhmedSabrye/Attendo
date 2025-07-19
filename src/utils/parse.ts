@@ -3,16 +3,19 @@ export interface AttendanceRecord {
   studentName: string;
   phoneId: string | null;
   duration: number;
-  done?: boolean;
 }
 export interface ComparisonRecord extends AttendanceRecord {
   studentId: number;
   attendance_alias?: string | null;
 }
+export interface FinalComparisonRecord extends ComparisonRecord {
+  isAbsent?: boolean;
+  isMatched?: boolean;
+}
 export interface SessionReport {
-  comparison: ComparisonRecord[];
+  comparison: FinalComparisonRecord[];
   notMatchedStudents: AttendanceRecord[];
-  absentStudents: Student[];
+  absentStudents: FinalComparisonRecord[];
 }
 export interface ValidationReport {
   isValid: boolean;
@@ -173,9 +176,10 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
 // this one will compare the students in the group with the students in the attendance sheet
 // if
 export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecord[], groupStudents: Student[], duplicatesIdxs: string[]) {
-  const comparison: ComparisonRecord[] = [];
+  const comparison: FinalComparisonRecord[] = [];
   const attendanceSheetCopy = [...attendanceSheet];
   const groupStudentsCopy = structuredClone(groupStudents);
+
   groupStudentsCopy.forEach((student, groupIndex) => {
     attendanceSheetCopy.forEach((record, index) => {
       // Convert phone numbers to 3-digit strings with leading zeros for comparison
@@ -201,21 +205,31 @@ export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecor
               phoneId: studentPhone,
               duration: record.duration ?? 0,
               attendance_alias: aliasMatch ? student.attendance_alias ?? null : record.studentName,
+              isAbsent: record.duration < 40,
+              isMatched: true,
             });
-          }
-          if (record.duration < 40 && !existingRecord) {
-            groupStudentsCopy[groupIndex].isAbsent = true;
           }
           attendanceSheetCopy.splice(index, 1);
           groupStudentsCopy[groupIndex].isMatched = true;
-        }
+        } 
       }
     });
+    if(!groupStudentsCopy[groupIndex].isMatched){
+        comparison.push({
+          studentName: student.name ?? "",
+          studentId: student.student_id ?? 0,
+          phoneId: student.phone_last_3 ?? null,
+          duration: 0,
+          attendance_alias: student.attendance_alias ?? null,
+          isAbsent: true,
+          isMatched: false,
+        });
+    }
   });
 
-  const absentStudents = groupStudentsCopy.filter((student) => !student.isMatched || student.isAbsent);
-
-  return { comparison, notMatchedStudents: attendanceSheetCopy, absentStudents: absentStudents };
+  const absentStudents = comparison.filter((student) => !student.isMatched || student.isAbsent);
+// handle
+  return { comparison, notMatchedStudents: attendanceSheetCopy, absentStudents };
 }
 
 
