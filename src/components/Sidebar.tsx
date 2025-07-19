@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/stores/hooks";
 import { useSignOutMutation } from "@/stores/auth.slice";
 import { toggleCreateGroupModal, toggleSidebar } from "@/stores/modals";
 import { useDeleteGroupMutation, useGetGroupsQuery } from "@/stores/api";
+import { toast } from "react-toastify";
 
 export default function GroupsSidebar() {
   const { groupId } = useParams();
@@ -27,6 +28,8 @@ export default function GroupsSidebar() {
     if (window.confirm(`Are you sure you want to delete "${group.group_name}"?`)) {
       try {
         await deleteGroupMutation(group.group_id).unwrap();
+        toast.success("Group deleted successfully");
+        navigate("/groups");
       } catch (error) {
         console.error("Error deleting group:", error);
       }
