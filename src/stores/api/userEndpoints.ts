@@ -15,7 +15,10 @@ export const userEndpoints = (builder: EndpointBuilder<any, any, any>) => ({
     providesTags: ["User"],
   }),
 
-  updateUser: builder.mutation<User, { userId: number; updates: Partial<Pick<User, "username" | "email">> }>({
+  updateUser: builder.mutation<
+    User,
+    { userId: number; updates: Partial<Pick<User, "username" | "email">> }
+  >({
     queryFn: async ({ userId, updates }) => {
       try {
         const data = await supabaseApi.user.updateUser(userId, updates);

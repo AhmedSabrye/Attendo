@@ -80,4 +80,20 @@ export const groupsApi = {
       throw error;
     }
   },
+
+  // Update group duration threshold
+  async updateGroupDurationThreshold(
+    groupId: number,
+    durationThreshold: number
+  ): Promise<Group> {
+    try {
+      return await handleRpcCall<Group>("update_duration_threeshold", {
+        p_group_id: groupId,
+        p_duration_threshold: durationThreshold,
+      });
+    } catch (error) {
+      console.error("Error updating group duration threshold:", error);
+      throw error;
+    }
+  },  
 };

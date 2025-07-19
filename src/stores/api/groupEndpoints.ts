@@ -74,4 +74,16 @@ export const groupEndpoints = (builder: EndpointBuilder<any, any, any>) => ({
     },
     invalidatesTags: ["Group", "Student", "Attendance"],
   }),
+
+  updateGroupDurationThreshold: builder.mutation<Group, { groupId: number; durationThreshold: number }>({
+    queryFn: async ({ groupId, durationThreshold }) => {
+      try {
+        const data = await supabaseApi.groups.updateGroupDurationThreshold(groupId, durationThreshold);
+        return { data };
+      } catch (error) {
+        return { error: { status: "FETCH_ERROR", error: String(error) } };
+      }
+    },
+    invalidatesTags : ["Group"]
+  }),
 });

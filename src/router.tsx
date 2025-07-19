@@ -8,7 +8,10 @@ import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import GroupLayout from "./pages/Layouts/GroupLayout";
+import ProfileLayout from "./pages/Layouts/ProfileLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfilePage from "./pages/ProfilePage";
+import GroupSettings from "./components/GroupSettings/GroupSettings";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +25,20 @@ export const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupPage />,
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <ProfileLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "/profile",
+        element: <ProfilePage />,
+      },
+    ],
   },
   {
     path: "/groups",
@@ -54,7 +71,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "/groups/:groupId/settings",
-            element: <div>Settings</div>,
+            element: <GroupSettings />,
           },
         ],
       },

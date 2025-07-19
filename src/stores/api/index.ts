@@ -31,7 +31,7 @@ export const {
   useUpdateGroupMutation,
   useUpdateGroupDuplicatedIndicesMutation,
   useDeleteGroupMutation,
-
+  useUpdateGroupDurationThresholdMutation,
   // Student hooks
   useGetStudentsQuery,
   useGetStudentQuery,

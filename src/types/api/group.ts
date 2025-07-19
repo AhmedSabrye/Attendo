@@ -5,4 +5,5 @@ export interface Group {
   created_at: string;
   duplicated_idx: string[];
   Users?: { username: string };
+  duration_threshold?: number;
 }
