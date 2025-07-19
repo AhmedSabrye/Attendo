@@ -133,7 +133,7 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
     let duration = 0;
     if (durationColumnIndex !== -1 && row[durationColumnIndex]) {
       // if the duration is not a number, make it 0, and must be positive number
-      let duration = parseInt(row[durationColumnIndex], 10) || 0;
+      duration = parseInt(row[durationColumnIndex], 10) || 0;
       if (duration < 0) {
         duration = 0;
       }
