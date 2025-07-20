@@ -1,10 +1,9 @@
 import { useMemo, useState, useRef } from "react";
 import { FiX, FiCheck } from "react-icons/fi";
-import { type AttendanceRecord } from "@/utils/parse";
+import type { AttendanceRecord } from "@/utils/parse";
 import { generateValidationReport } from "@/utils/generateValidationReport";
 import type { Student } from "@/utils/api";
 import type {
-  ComparisonRecord,
   FinalComparisonRecord,
   ValidationReport,
 } from "@/utils/parse";
@@ -33,7 +32,7 @@ interface AssignedMatch {
 }
 
 function FixAttendanceModal({
-  absentStudents,
+  // absentStudents,
   notMatchedStudents,
   comparison,
   onDone,

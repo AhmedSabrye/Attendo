@@ -15,7 +15,6 @@ import {
 import { HashLoader } from "react-spinners";
 import {
   useGetGroupQuery,
-  useUpdateGroupMutation,
   useDeleteGroupMutation,
   useUpdateGroupDurationThresholdMutation,
 } from "../../stores/api";
@@ -29,32 +28,32 @@ export default function GroupSettings() {
 
   // Queries and mutations
   const { data: group, isLoading } = useGetGroupQuery(numericGroupId!);
-  const [updateGroup, { isLoading: isUpdating }] = useUpdateGroupMutation();
+  // const [updateGroup] = useUpdateGroupMutation();
   const [deleteGroup, { isLoading: isDeleting }] = useDeleteGroupMutation();
 
   // Local state
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [newGroupName, setNewGroupName] = useState(group?.group_name || "");
+  // const [isEditingName, setIsEditingName] = useState(false);
+  // const [newGroupName, setNewGroupName] = useState(group?.group_name || "");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isEditingDuration, setIsEditingDuration] = useState(false);
   const [newDurationThreshold, setNewDurationThreshold] = useState(
     group?.duration_threshold?.toString() || "0"
   );
-  const [updateGroupDurationThreshold, { isLoading: isUpdatingDuration }] = useUpdateGroupDurationThresholdMutation();    
+  const [updateGroupDurationThreshold] = useUpdateGroupDurationThresholdMutation();    
 
-  const handleUpdateGroupName = async () => {
-    if (!numericGroupId || !newGroupName.trim()) return;
+  // const handleUpdateGroupName = async () => {
+    // if (!numericGroupId || !newGroupName.trim()) return;
 
-    try {
-      await updateGroup({
-        groupId: numericGroupId,
-        updates: { group_name: newGroupName.trim() },
-      }).unwrap();
-      setIsEditingName(false);
-    } catch (error) {
-      console.error("Failed to update group name:", error);
-    }
-  };
+  //   try {
+  //     await updateGroup({
+  //       groupId: numericGroupId,
+  //       updates: { group_name: newGroupName.trim() },
+  //     }).unwrap();
+  //     setIsEditingName(false);
+  //   } catch (error) {
+  //     console.error("Failed to update group name:", error);
+  //   }
+  // };
 
   const handleDeleteGroup = async () => {
     if (!numericGroupId) return;
