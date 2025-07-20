@@ -64,8 +64,8 @@ Attendo is a modern web-based attendance tracking application designed to stream
 ## 📹 Video Tutorial
 
 <div align="center">
-  <a href="" target="_blank">
-    <img src="https://drive.google.com/drive/u/2/folders/19gnQlTyZMjUjc4NpoX76Is3ymf0ThTcA" alt="Watch Demo Video" style="width: 300px;">
+  <a href="https://drive.google.com/drive/u/2/folders/19gnQlTyZMjUjc4NpoX76Is3ymf0ThTcA" target="_blank">
+    <img src="https://img.shields.io/badge/Watch%20Demo-Video%20Tutorial-blue?style=for-the-badge&logo=play-circle" alt="Watch Demo Video" style="width: 300px;">
   </a>
   <p><em>Click to watch the complete walkthrough of Attendo features and usage</em></p>
 </div>
