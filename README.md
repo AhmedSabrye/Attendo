@@ -65,7 +65,7 @@ Attendo is a modern web-based attendance tracking application designed to stream
 
 <div align="center">
   <video width="800" controls style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-    <source src="/Attendo Tutorial .mp4" type="video/mp4">
+    <source src="./public/Attendo Tutorial .mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
   <p><em>Complete walkthrough of Attendo features and usage</em></p>
@@ -84,21 +84,21 @@ Attendo is a modern web-based attendance tracking application designed to stream
 ### 1. Overview Dashboard
 
 <div align="center">
-  <img src="/Overview.png" alt="Overview Dashboard" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  <img src="./public/Overview.png" alt="Overview Dashboard" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
   <p><em>Visual attendance matrix showing student attendance across all sessions</em></p>
 </div>
 
 ### 2. Reports List
 
 <div align="center">
-  <img src="/Reports List.png" alt="Reports List" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  <img src="./public/Reports List.png" alt="Reports List" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
   <p><em>List of all attendance reports with session details and statistics</em></p>
 </div>
 
 ### 3. Report Details
 
 <div align="center">
-  <img src="/Report Details.png" alt="Report Details" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  <img src="./public/Report Details.png" alt="Report Details" width="800" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
   <p><em>Detailed session report with individual student attendance and export options</em></p>
 </div>
 
