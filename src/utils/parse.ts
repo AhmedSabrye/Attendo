@@ -175,7 +175,7 @@ export function parseAttendanceSheet(csv: string): AttendanceRecord[] {
 }
 // this one will compare the students in the group with the students in the attendance sheet
 // if
-export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecord[], groupStudents: Student[], duplicatesIdxs: string[]) {
+export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecord[], groupStudents: Student[], duplicatesIdxs: string[], durationThreshold: number) {
   const comparison: FinalComparisonRecord[] = [];
   const attendanceSheetCopy = [...attendanceSheet];
   const groupStudentsCopy = structuredClone(groupStudents);
@@ -205,7 +205,7 @@ export function generateSessionAttendanceReport(attendanceSheet: AttendanceRecor
               phoneId: studentPhone,
               duration: record.duration ?? 0,
               attendance_alias: aliasMatch ? student.attendance_alias ?? null : record.studentName,
-              isAbsent: record.duration < 40,
+              isAbsent: record.duration < durationThreshold,
               isMatched: true,
             });
           }

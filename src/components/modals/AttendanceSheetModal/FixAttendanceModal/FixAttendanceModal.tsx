@@ -23,6 +23,7 @@ interface FixAttendanceModalProps {
   onClose: () => void;
   setValidationReport: (report: ValidationReport) => void;
   groupStudents: Student[];
+  durationThreshold: number;
 }
 
 interface AssignedMatch {
@@ -39,6 +40,7 @@ function FixAttendanceModal({
   onClose,
   setValidationReport,
   groupStudents,
+  durationThreshold,
 }: FixAttendanceModalProps) {
   const [localComparison, setLocalComparison] = useState<
     FinalComparisonRecord[]
@@ -48,7 +50,6 @@ function FixAttendanceModal({
     return localComparison.filter((c) => c.isAbsent);
   }, [localComparison]);
 
-  console.log(localAbsent);
   const [localUnmatched, setLocalUnmatched] = useState<AttendanceRecord[]>(
     [...notMatchedStudents].sort((a, b) =>
       (a.studentName ?? "").localeCompare(b.studentName ?? "")
@@ -159,7 +160,6 @@ function FixAttendanceModal({
         totalDuration,
       },
     ]);
-    console.log(localComparison);
 
     // Add / update comparison record for this student
     setLocalComparison((prev) => {
@@ -167,7 +167,6 @@ function FixAttendanceModal({
         (c) => c.studentId === student.studentId
       );
       const duration = totalDuration + (prev[existingIdx]?.duration || 0);
-      console.log(duration);
       const newEntry: FinalComparisonRecord = {
         studentName: student.studentName ?? "",
         studentId: student.studentId,
@@ -175,7 +174,7 @@ function FixAttendanceModal({
         duration,
         attendance_alias:
           student.attendance_alias ?? selectedRecords[0].studentName,
-        isAbsent: duration < 40,
+        isAbsent: durationThreshold ? duration < durationThreshold : false,
         isMatched: true,
       };
       if (existingIdx !== -1) {
@@ -238,7 +237,7 @@ function FixAttendanceModal({
           copy[existingIdx] = {
             ...existing,
             duration: newDuration < 0 ? 0 : newDuration,
-            isAbsent: newDuration < 40,
+            isAbsent: newDuration < durationThreshold ,
           };
           return copy;
         
