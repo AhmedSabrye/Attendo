@@ -1,3 +1,11 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+body{
+  font-family: "Poppins", sans-serif;
+}
+
+.font-alegreya{
+  font-family: "Alegreya", serif;
+}
