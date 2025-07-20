@@ -232,16 +232,16 @@ function FixAttendanceModal({
       if (existingIdx !== -1) {
         const existing = prev[existingIdx];
         const newDuration = existing.duration - matchToUndo.totalDuration;
-
-        if (newDuration <= 0) {
-          // Remove the entry entirely
-          return prev.filter((_, idx) => idx !== existingIdx);
-        } else {
+ 
           // Update with reduced duration
-          const copy = [...prev];
-          copy[existingIdx] = { ...existing, duration: newDuration };
+          const copy = structuredClone(prev);
+          copy[existingIdx] = {
+            ...existing,
+            duration: newDuration < 0 ? 0 : newDuration,
+            isAbsent: newDuration < 40,
+          };
           return copy;
-        }
+        
       }
       return prev;
     });
