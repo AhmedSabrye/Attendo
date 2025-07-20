@@ -3,16 +3,20 @@ import { FiX, FiCheck } from "react-icons/fi";
 import { type AttendanceRecord } from "@/utils/parse";
 import { generateValidationReport } from "@/utils/generateValidationReport";
 import type { Student } from "@/utils/api";
-import type { ComparisonRecord, FinalComparisonRecord, ValidationReport } from "@/utils/parse";
+import type {
+  ComparisonRecord,
+  FinalComparisonRecord,
+  ValidationReport,
+} from "@/utils/parse";
 import { distance } from "fastest-levenshtein";
 import SearchInput from "./searchInput";
 
 interface FixAttendanceModalProps {
   absentStudents: FinalComparisonRecord[];
   notMatchedStudents: AttendanceRecord[];
-  comparison: ComparisonRecord[];
+  comparison: FinalComparisonRecord[];
   onDone: (
-    updatedComparison: ComparisonRecord[],
+    updatedComparison: FinalComparisonRecord[],
     remainingAbsent: FinalComparisonRecord[],
     remainingUnmatched: AttendanceRecord[]
   ) => void;
@@ -36,23 +40,20 @@ function FixAttendanceModal({
   setValidationReport,
   groupStudents,
 }: FixAttendanceModalProps) {
-  // Local working copies so we don't mutate props directly
-  const [localAbsent, setLocalAbsent] = useState<FinalComparisonRecord[]>(
-    [...absentStudents].sort((a, b) =>
-      (a.studentName ?? "").localeCompare(b.studentName ?? "")
-    )
-  );
+  const [localComparison, setLocalComparison] = useState<
+    FinalComparisonRecord[]
+  >([...comparison]);
+
+  const localAbsent = useMemo(() => {
+    return localComparison.filter((c) => c.isAbsent);
+  }, [localComparison]);
+
+  console.log(localAbsent);
   const [localUnmatched, setLocalUnmatched] = useState<AttendanceRecord[]>(
     [...notMatchedStudents].sort((a, b) =>
       (a.studentName ?? "").localeCompare(b.studentName ?? "")
     )
   );
-  const [localComparison, setLocalComparison] = useState<
-    (AttendanceRecord & {
-      studentId: number;
-      attendance_alias?: string | null;
-    })[]
-  >([...comparison]);
 
   // New state to track assigned matches for undo functionality
   const [assignedMatches, setAssignedMatches] = useState<AssignedMatch[]>([]);
@@ -165,19 +166,20 @@ function FixAttendanceModal({
       const existingIdx = prev.findIndex(
         (c) => c.studentId === student.studentId
       );
-      const newEntry: AttendanceRecord & {
-        studentId: number;
-        attendance_alias?: string | null;
-      } = {
+      const duration = totalDuration + (prev[existingIdx]?.duration || 0);
+      console.log(duration);
+      const newEntry: FinalComparisonRecord = {
         studentName: student.studentName ?? "",
         studentId: student.studentId,
         phoneId: student.phoneId ?? null,
-        duration: totalDuration + (prev[existingIdx]?.duration || 0),
+        duration,
         attendance_alias:
           student.attendance_alias ?? selectedRecords[0].studentName,
+        isAbsent: duration < 40,
+        isMatched: true,
       };
       if (existingIdx !== -1) {
-        const copy = [...prev];
+        const copy = structuredClone(prev);
         copy[existingIdx] = newEntry;
         return copy;
       }
@@ -185,9 +187,9 @@ function FixAttendanceModal({
     });
 
     // Remove the student from absent list
-    setLocalAbsent((prev) =>
-      prev.filter((s) => s.studentId !== student.studentId)
-    );
+    // setLocalAbsent((prev) =>
+    //   prev.filter((s) => s.studentId !== student.studentId)
+    // );
 
     // Remove selected unmatched rows
     setLocalUnmatched((prev) =>
@@ -209,11 +211,11 @@ function FixAttendanceModal({
     if (!matchToUndo) return;
 
     // Add student back to absent list
-    setLocalAbsent((prev) =>
-      [...prev, matchToUndo.student].sort((a, b) =>
-        (a.studentName ?? "").localeCompare(b.studentName ?? "")
-      )
-    );
+    // setLocalAbsent((prev) =>
+    //   [...prev, matchToUndo.student].sort((a, b) =>
+    //     (a.studentName ?? "").localeCompare(b.studentName ?? "")
+    //   )
+    // );
 
     // Add unmatched records back
     setLocalUnmatched((prev) =>
@@ -310,7 +312,11 @@ function FixAttendanceModal({
             </h3>
             {/* Search input for absent students */}
             {searchEnabled && (
-              <SearchInput search={absentSearch} setSearch={setAbsentSearch} placeholder="Search absent..." />
+              <SearchInput
+                search={absentSearch}
+                setSearch={setAbsentSearch}
+                placeholder="Search absent..."
+              />
             )}
             <div className="border rounded-lg divide-y max-h-32 md:max-h-72 overflow-y-auto">
               {[...localAbsent]
@@ -321,7 +327,9 @@ function FixAttendanceModal({
                       .toLowerCase()
                       .includes(absentSearch.toLowerCase())
                 )
-                .sort((a, b) => (a.studentName ?? "").localeCompare(b.studentName ?? ""))
+                .sort((a, b) =>
+                  (a.studentName ?? "").localeCompare(b.studentName ?? "")
+                )
                 .map((student) => (
                   <label
                     key={student.studentId}
@@ -333,7 +341,10 @@ function FixAttendanceModal({
                       value={student.studentId}
                       checked={selectedStudentId === student.studentId}
                       onChange={() =>
-                        handleSelectStudent(student.studentId, student.studentName ?? "")
+                        handleSelectStudent(
+                          student.studentId,
+                          student.studentName ?? ""
+                        )
                       }
                     />
                     <span>{student.studentName}</span>
@@ -363,7 +374,11 @@ function FixAttendanceModal({
             </h3>
             {/* Search input for unmatched records */}
             {searchEnabled && (
-              <SearchInput search={unmatchedSearch} setSearch={setUnmatchedSearch} placeholder="Search unmatched..." />
+              <SearchInput
+                search={unmatchedSearch}
+                setSearch={setUnmatchedSearch}
+                placeholder="Search unmatched..."
+              />
             )}
             <div className="border rounded-lg divide-y max-h-32 md:max-h-72 overflow-y-auto">
               {localUnmatched
