@@ -66,8 +66,14 @@ function FixAttendanceModal({
   const [absentSearch, setAbsentSearch] = useState("");
   const [unmatchedSearch, setUnmatchedSearch] = useState("");
   // State for toggling search and smart match
-  const [searchEnabled, setSearchEnabled] = useState(false);
-  const [smartMatchEnabled, setSmartMatchEnabled] = useState(false);
+  const [searchEnabled, setSearchEnabled] = useState(()=>{
+    const searchEnabled = localStorage.getItem("searchEnabled");
+    return searchEnabled === "true" ? true : false;
+  });
+  const [smartMatchEnabled, setSmartMatchEnabled] = useState(()=>{
+    const smartMatchEnabled = localStorage.getItem("smartMatchEnabled");
+    return smartMatchEnabled === "true" ? true : false;
+  });
 
   function handleSelectStudent(studentId: number, studentName: string) {
     setSelectedStudentId(studentId);
@@ -280,7 +286,10 @@ function FixAttendanceModal({
               <input
                 type="checkbox"
                 checked={searchEnabled}
-                onChange={(e) => setSearchEnabled(e.target.checked)}
+                onChange={(e) => {
+                  setSearchEnabled(e.target.checked);
+                  localStorage.setItem("searchEnabled", e.target.checked.toString());
+                }}
                 className="w-4 h-4 accent-blue-600 rounded focus:ring-2 focus:ring-blue-400 transition"
                 style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
               />
@@ -290,7 +299,10 @@ function FixAttendanceModal({
               <input
                 type="checkbox"
                 checked={smartMatchEnabled}
-                onChange={(e) => setSmartMatchEnabled(e.target.checked)}
+                onChange={(e) => {
+                  setSmartMatchEnabled(e.target.checked);
+                  localStorage.setItem("smartMatchEnabled", e.target.checked.toString());
+                }}
                 className="w-4 h-4 accent-green-600 rounded focus:ring-2 focus:ring-green-400 transition"
                 style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
               />
