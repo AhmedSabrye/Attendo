@@ -204,16 +204,9 @@ function FixAttendanceModal({
     similarNames.current = new Set();
   };
 
-  const handleUndoMatch = (matchIndex: number) => {
-    const matchToUndo = assignedMatches[matchIndex];
+  const handleUndoMatch = (studentId: number) => {
+    const matchToUndo = assignedMatches.find((assignedMatch) => assignedMatch.student.studentId === studentId);
     if (!matchToUndo) return;
-
-    // Add student back to absent list
-    // setLocalAbsent((prev) =>
-    //   [...prev, matchToUndo.student].sort((a, b) =>
-    //     (a.studentName ?? "").localeCompare(b.studentName ?? "")
-    //   )
-    // );
 
     // Add unmatched records back
     setLocalUnmatched((prev) =>
@@ -245,7 +238,7 @@ function FixAttendanceModal({
     });
 
     // Remove from assigned matches
-    setAssignedMatches((prev) => prev.filter((_, idx) => idx !== matchIndex));
+    setAssignedMatches((prev) => prev.filter((assignedMatch) => assignedMatch.student.studentId !== studentId));
   };
 
   const handleFinish = () => {
@@ -260,6 +253,7 @@ function FixAttendanceModal({
     );
     setValidationReport(report);
   };
+  console.log(assignedMatches);
   const reversedData = useMemo(() => {
     return [...assignedMatches].reverse(); // safe copy + reverse
   }, [assignedMatches]);
@@ -444,7 +438,7 @@ function FixAttendanceModal({
             }`}
         </p>
 
-        {/* Assigned Matches Display - Right Column */}
+        {/* Assigned Matches Display - Column */}
         {assignedMatches.length > 0 && (
           <div className="md:absolute -top-5 right-1/2 md:translate-x-1/2 max-h-64 md:-translate-y-full w-full md:w-80 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg shadow-lg p-4 z-20">
             <h3 className="font-medium mb-3 text-gray-800 border-b border-gray-300 pb-2">
@@ -471,7 +465,7 @@ function FixAttendanceModal({
                     </div>
                   </div>
                   <button
-                    onClick={() => handleUndoMatch(index)}
+                    onClick={() => handleUndoMatch(match.student.studentId)}
                     className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-1 flex-shrink-0"
                     title="Undo this assignment"
                   >
