@@ -466,7 +466,7 @@ function FixAttendanceModal({
 
         {/* Assigned Matches Display - Column */}
         {assignedMatches.length > 0 && (
-          <div className="md:absolute -top-5 right-1/2 md:translate-x-1/2 max-h-64 md:-translate-y-full w-full md:w-80 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg shadow-lg p-4 z-20">
+          <div className="md:absolute -top-5 right-1/2 md:translate-x-1/2 max-h-48 md:-translate-y-full w-full md:w-80 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg shadow-lg p-4 z-20">
             <h3 className="font-medium mb-3 text-gray-800 border-b border-gray-300 pb-2">
               Recent Assignments ({assignedMatches.length})
             </h3>
