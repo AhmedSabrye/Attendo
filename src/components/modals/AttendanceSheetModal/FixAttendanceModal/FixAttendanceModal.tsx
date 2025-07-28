@@ -248,7 +248,7 @@ function FixAttendanceModal({
   };
 
   const handleFinish = () => {
-    if (selectedStudentId != null || selectedUnmatchedIdxs.size !== 0) {
+    if (selectedStudentId != null && selectedUnmatchedIdxs.size !== 0) {
       toast.error("Assign or unselect an unmatched records", {
         toastId: "fix-attendance-modal",
       });
