@@ -1,5 +1,4 @@
 import {
-  utils,
   type Attendance,
   type AttendanceReport,
   type Student,
@@ -197,6 +196,13 @@ const config = (thing: "attended" | "partial" | "absent", duration: number) => {
 };
 
 // Helpers
+
+const getAttendanceStatus = (
+  durationMinutes: number
+): "attended" | "partial" | "absent" => {
+  if (durationMinutes > 0) return "partial";
+  return "absent";
+};
 const getStatus = (
   record?: Attendance
 ): { status: "attended" | "partial" | "absent"; duration: number } => {
@@ -204,7 +210,7 @@ const getStatus = (
   if (record.attended)
     return { status: "attended", duration: record.duration_minutes };
   return {
-    status: utils.getAttendanceStatus(record.duration_minutes),
+    status: getAttendanceStatus(record.duration_minutes),
     duration: record.duration_minutes,
   };
 };

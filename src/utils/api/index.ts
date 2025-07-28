@@ -7,7 +7,6 @@ export { groupsApi } from "./groupsApi";
 export { studentsApi } from "./studentsApi";
 export { attendanceApi } from "./attendanceApi";
 export { reportsApi } from "./reportsApi";
-export { utils } from "./utils";
 export { handleRpcCall } from "./helpers";
 
 // Import individual modules for default export
@@ -16,7 +15,6 @@ import { groupsApi } from "./groupsApi";
 import { studentsApi } from "./studentsApi";
 import { attendanceApi } from "./attendanceApi";
 import { reportsApi } from "./reportsApi";
-import { utils } from "./utils";
 
 // ==================== EXPORT ALL APIs ====================
 // Maintain backward compatibility with the original default export structure
@@ -26,7 +24,6 @@ const supabaseApi = {
   students: studentsApi,
   attendance: attendanceApi,
   reports: reportsApi,
-  utils,
 };
 
 export default supabaseApi;

@@ -10,7 +10,12 @@ interface ValidationSummaryProps {
   onFixClick: () => void;
 }
 
-export default function ValidationSummary({ report, absentStudents, notMatchedStudents, onFixClick }: ValidationSummaryProps) {
+export default function ValidationSummary({
+  report,
+  absentStudents,
+  notMatchedStudents,
+  onFixClick,
+}: ValidationSummaryProps) {
   const hasErrors = absentStudents.length > 0 || notMatchedStudents.length > 0;
   const totalUnmatched = absentStudents.length + notMatchedStudents.length;
 
@@ -18,38 +23,9 @@ export default function ValidationSummary({ report, absentStudents, notMatchedSt
     <div className="bg-white border rounded-lg p-4">
       {/* Summary Statistics */}
       <div className="grid grid-cols-4 gap-3 mb-4">
-        <SummaryCard
-          title="Total Students"
-          value={report.summary.totalStudents}
-          icon={<FiUsers className="text-blue-600" size={30} />}
-          textColor="text-blue-600"
-          bgColor="bg-blue-50"
-          textColor2="text-blue-600"
-        />
-        <SummaryCard
-          title="Attended"
-          value={report.summary.attendedStudents}
-          icon={<BsPersonRaisedHand className="text-green-600" size={30} />}
-          textColor="text-green-600"
-          bgColor="bg-green-50"
-          textColor2="text-green-600"
-        />
-        <SummaryCard
-          title="Absent"
-          value={report.summary.absentStudents}
-          icon={<MdOutlinePersonOff className="text-red-600" size={30} />}
-          textColor="text-red-600"
-          bgColor="bg-red-50"
-          textColor2="text-red-600"
-        />
-        <SummaryCard
-          title="Avg Duration"
-          value={report.summary.averageDuration}
-          icon={<FiClock className="text-purple-600" size={30} />}
-          textColor="text-purple-600"
-          bgColor="bg-purple-50"
-          textColor2="text-purple-600"
-        />
+        {summaryCardsArrayGenerator(report).map((card) => (
+          <SummaryCard key={card.title} {...card} />
+        ))}
       </div>
 
       {/* Warnings Alert */}
@@ -58,10 +34,14 @@ export default function ValidationSummary({ report, absentStudents, notMatchedSt
           <div className="flex items-center gap-2">
             <FiAlertTriangle className="text-orange-600" size={16} />
             <span className="text-sm font-medium text-orange-800">
-              {totalUnmatched} unmatched student{totalUnmatched !== 1 ? "s" : ""}
+              {totalUnmatched} unmatched student
+              {totalUnmatched !== 1 ? "s" : ""}
             </span>
           </div>
-          <button onClick={onFixClick} className="px-12 animate-pulse py-1 bg-orange-600 text-white text-lg rounded-xl  hover:bg-orange-700">
+          <button
+            onClick={onFixClick}
+            className="px-12 animate-pulse py-1 bg-orange-600 text-white text-lg rounded-xl  hover:bg-orange-700"
+          >
             Fix
           </button>
         </div>
@@ -95,3 +75,38 @@ const SummaryCard = ({
     </div>
   );
 };
+
+const summaryCardsArrayGenerator = (report: ValidationReport) => [
+  {
+    title: "Total Students",
+    value: report.summary.totalStudents,
+    icon: <FiUsers className="text-blue-600" size={30} />,
+    bgColor: "bg-blue-50",
+    textColor: "text-blue-600",
+    textColor2: "text-blue-600",
+  },
+  {
+    title: "Attended",
+    value: report.summary.attendedStudents,
+    icon: <BsPersonRaisedHand className="text-green-600" size={30} />,
+    bgColor: "bg-green-50",
+    textColor: "text-green-600",
+    textColor2: "text-green-600",
+  },
+  {
+    title: "Absent",
+    value: report.summary.absentStudents,
+    icon: <MdOutlinePersonOff className="text-red-600" size={30} />,
+    bgColor: "bg-red-50",
+    textColor: "text-red-600",
+    textColor2: "text-red-600",
+  },
+  {
+    title: "Avg Duration",
+    value: report.summary.averageDuration,
+    icon: <FiClock className="text-purple-600" size={30} />,
+    bgColor: "bg-purple-50",
+    textColor: "text-purple-600",
+    textColor2: "text-purple-600",
+  },
+];

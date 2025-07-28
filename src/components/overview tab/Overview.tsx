@@ -32,15 +32,19 @@ export default function OverviewTab() {
     ?.filter((s) => s.is_active)
     .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
 
-
-    const {data: reports} = useGetAllReportsForGroupQuery({groupId: numericGroupId ?? 0, groupName: ""})
+  // Fetching all reports for the group
+  const { data: reports } = useGetAllReportsForGroupQuery({
+    groupId: numericGroupId ?? 0,
+    groupName: "",
+  });
+  // Fetching all attendance records for the group
   const { data: attendance, isLoading: attendanceLoading } =
-    useGetAttendanceByGroupQuery({ groupId: numericGroupId ?? 0 });
+  useGetAttendanceByGroupQuery({ groupId: numericGroupId ?? 0 });
   const [updateAttendance, { isLoading: isUpdating }] =
     useUpdateAttendanceMutation();
+  // Toggling individual student attendance logic
   const [selectedStudent, setSelectedStudent] =
     useState<SelectedStudent | null>(null);
-
   function handleSelectingStudent(student: SelectedStudent) {
     setSelectedStudent(student);
   }
