@@ -2,15 +2,24 @@ import { useState, useMemo } from "react";
 import { FiCheck, FiX } from "react-icons/fi";
 import { useParams } from "react-router";
 import { parseTemplate } from "@/utils/parse";
-import { useGetStudentsQuery, useSyncStudentsMutation, useUpdateGroupDuplicatedIndicesMutation } from "@/stores/api";
+import {
+  useGetStudentsQuery,
+  useSyncStudentsMutation,
+  useUpdateGroupDuplicatedIndicesMutation,
+} from "@/stores/api";
 import DiffIndicator from "./DiffIndicator";
 import type { Student } from "@/utils/api";
 
 interface TemplateManagerProps {
   onClose: () => void;
 }
-export interface ParsedStudent extends Pick<Student, "name" | "phone_last_3" | "order_index"> {}
-export interface OrderUpdate extends Pick<Student, "student_id" | "name" | "phone_last_3" | "order_index"> {}
+export interface ParsedStudent
+  extends Pick<Student, "name" | "phone_last_3" | "order_index"> {}
+export interface OrderUpdate
+  extends Pick<
+    Student,
+    "student_id" | "name" | "phone_last_3" | "order_index"
+  > {}
 
 const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const [template, setTemplate] = useState("");
@@ -20,28 +29,48 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const { groupId } = useParams();
 
   // Fetch current students for this group
-  const { data: allStudents = [] } = useGetStudentsQuery(groupId ? Number(groupId) : undefined);
+  const { data: allStudents = [] } = useGetStudentsQuery(
+    groupId ? Number(groupId) : undefined
+  );
   const students = allStudents?.filter((s) => s.is_active);
 
   // Bulk sync mutation
   const [syncStudents] = useSyncStudentsMutation();
-  const [updateGroupDuplicatedIndices] = useUpdateGroupDuplicatedIndicesMutation();
+  const [updateGroupDuplicatedIndices] =
+    useUpdateGroupDuplicatedIndicesMutation();
 
   // Compute differences between parsed list and existing students
   const diff = useMemo(() => {
-    const key = (name: string, phoneLast3: string | number | null) => `${name.trim().toLowerCase()}|${String(phoneLast3).slice(-3)}`;
+    const GenerateKey = (name: string, phoneLast3: string | number | null) =>
+      `${name.trim().toLowerCase()}|${String(phoneLast3).slice(-3)}`;
 
-    const currentSet = new Set(students.map((s) => key(s.name, s.phone_last_3?.trim() ?? "")));
-    const incomingSet = new Set(parsed.map((p) => key(p.name, p.phone_last_3?.trim() ?? "")));
-    const toAdd = parsed.filter((p) => !currentSet.has(key(p.name, p.phone_last_3?.trim() ?? "")));
-    const toRemove = students.filter((s) => !incomingSet.has(key(s.name, s.phone_last_3?.trim() ?? "")));
-    const toReactivate = students.filter((s) => !s.is_active && incomingSet.has(key(s.name, s.phone_last_3?.trim() ?? "")));
+    const currentSet = new Set(
+      students.map((s) => GenerateKey(s.name, s.phone_last_3?.trim() ?? ""))
+    );
+    const incomingSet = new Set(
+      parsed.map((p) => GenerateKey(p.name, p.phone_last_3?.trim() ?? ""))
+    );
+    const toAdd = parsed.filter(
+      (p) => !currentSet.has(GenerateKey(p.name, p.phone_last_3?.trim() ?? ""))
+    );
+    const toRemove = students.filter(
+      (s) => !incomingSet.has(GenerateKey(s.name, s.phone_last_3?.trim() ?? ""))
+    );
+    const toReactivate = students.filter(
+      (s) =>
+        !s.is_active &&
+        incomingSet.has(GenerateKey(s.name, s.phone_last_3?.trim() ?? ""))
+    );
 
     // Determine order updates for existing students
-    const parsedMap = new Map(parsed.map((p) => [key(p.name, p.phone_last_3 ?? ""), p]));
+    const parsedMap = new Map(
+      parsed.map((p) => [GenerateKey(p.name, p.phone_last_3 ?? ""), p])
+    );
     const orderUpdates: OrderUpdate[] = students
       .map((s) => {
-        const match = parsedMap.get(key(s.name, s.phone_last_3?.trim() ?? ""));
+        const match = parsedMap.get(
+          GenerateKey(s.name, s.phone_last_3?.trim() ?? "")
+        );
         if (match && s.order_index !== match.order_index) {
           return {
             student_id: s.student_id,
@@ -95,11 +124,16 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Template Manager</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Template Manager
+          </h2>
           <p className="text-sm text-gray-600">Group Name</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600">
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600"
+          >
             <FiX size={20} />
           </button>
         </div>
@@ -108,7 +142,9 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
       <div className="p-6">
         {/* Template Input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Student Template</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Student Template
+          </label>
           <textarea
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
