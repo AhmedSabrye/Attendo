@@ -1,68 +1,28 @@
 import {
   HiArrowLeft,
-  HiCalendar,
-  HiCheckCircle,
-  HiXCircle,
-  HiUser,
+  HiCalendar
 } from "react-icons/hi2";
 import { Link, useParams } from "react-router";
 import SummaryCards from "./SummaryCards";
 import {
   useGetReportByIdQuery,
   useUpdateAttendanceMutation,
-} from "../../../stores/api";
-import AttendanceToggleModal from "../../modals/AttendanceToggleModal";
+} from "@/stores/api";
+import AttendanceToggleModal from "@/components/modals/AttendanceToggleModal";
 import { useState } from "react";
-import { copyToClipboard } from "../../../utils/copyToClipboard";
-import type { AttendanceReport } from "../../../types/api";
+import type { AttendanceReport } from "@/types/api";
 import ReportDetailsTable from "./ReportDetailsTable";
+import ReportDetailsActionButtons from "./ReportDetailsActionButtons";
 
-function getSummaryCards(
-  report: AttendanceReport,
-  attendedCount: number,
-  absentCount: number,
-  totalCount: number
-) {
-  if (!report) return [];
-
-  return [
-    {
-      label: "Total",
-      value: totalCount.toString(),
-      Icon: HiUser,
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600",
-    },
-    {
-      label: "Attended",
-      value: attendedCount.toString(),
-      Icon: HiCheckCircle,
-      bgColor: "bg-green-50",
-      textColor: "text-green-600",
-    },
-    {
-      label: "Absent",
-      value: absentCount.toString(),
-      Icon: HiXCircle,
-      bgColor: "bg-red-50",
-      textColor: "text-red-600",
-    },
-    {
-      label: "Rate",
-      value: `${((attendedCount / totalCount) * 100).toFixed(0)}%`,
-      Icon: null,
-      bgColor: "bg-emerald-50",
-      textColor: "text-emerald-600",
-    },
-  ];
-}
 
 export default function ReportDetails() {
   const { groupId, reportId } = useParams();
 
   const numericGroupId = groupId ? Number(groupId) : undefined;
   const [order, setOrder] = useState<string>("template");
-  const [isCopied, setIsCopied] = useState<boolean>(false);
+  function handleOrderChange(order: string) {
+    setOrder(order);
+  }
   const {
     data: report,
     isLoading,
@@ -99,75 +59,40 @@ export default function ReportDetails() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 relative">
-        <div className="flex flex-col md:flex-row  md:px-10 items-center  justify-between text-center gap-4">
-          <Link
-            to={`/groups/${groupId}/reports`}
-            className="p-2  absolute left-2 top-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-colors z-10"
-          >
-            <HiArrowLeft className="text-lg text-gray-600" />
-          </Link>
-          <div className="flex flex-col items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-600">
-              Attendance Report
-            </h3>
-            <p className="text-2xl font-semibold text-gray-900">{dateParam}</p>
-            {report && (
-              <SummaryCards
-                summaryCards={getSummaryCards(
-                  report,
-                  attendedCount,
-                  absentCount,
-                  totalCount
-                )}
-              />
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2 flex-col">
-            <button
-              className={`bg-blue-500 text-white px-4 py-2 rounded-md transition-colors cursor-pointer text-sm w-full  duration-500 ${
-                isCopied ? "bg-green-500" : ""
-              }`}
-              onClick={async () => {
-                const success = await copyToClipboard(report);
-                if (success) {
-                  setIsCopied(true);
-                  setTimeout(() => {
-                    setIsCopied(false);
-                  }, 2000);
-                } else {
-                  setIsCopied(false);
-                }
-              }}
-            >
-              {isCopied ? "Copied!" : "Copy to Google Sheets"}
-            </button>
-            <div className="flex items-center justify-around gap-2 w-full">
-              <label
-                htmlFor="order"
-                className="text-sm text-gray-600 font-semibold min-w-fit"
-              >
-                Order by
-              </label>
-              <select
-                id="order"
-                className="w-full text-sm text-gray-600 bg-gray-100 rounded-md p-2"
-                value={order}
-                onChange={(e) => {
-                  setOrder(e.target.value);
-                }}
-              >
-                <option value="alphabetical">Alphabetical</option>
-                <option value="template">Same order as sheet</option>
-              </select>
-            </div>
-          </div>
+      <div className="p-4 border-b border-gray-200 relative flex flex-col md:flex-row  md:px-10 items-center  justify-between text-center gap-4">
+        <Link
+          to={`/groups/${groupId}/reports`}
+          className="p-2  absolute left-2 top-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-colors z-10"
+        >
+          <HiArrowLeft className="text-lg text-gray-600" />
+        </Link>
+        <div className="flex flex-col items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-600">
+            Attendance Report
+          </h3>
+          <p className="text-2xl font-semibold text-gray-900">{dateParam}</p>
+          {/* Summary Cards */}
+          {report && (
+            <SummaryCards
+              report={report}
+              attendedCount={attendedCount}
+              absentCount={absentCount}
+              totalCount={totalCount}
+            />
+          )}
         </div>
+
+        {/* Action Buttons */}
+        {report && (
+          <ReportDetailsActionButtons
+            report={report}
+            order={order}
+            handleOrderChange={handleOrderChange}
+          />
+        )}
       </div>
 
-      {/* Main Content */}
+      {/* Report Content */}
       <div className="p-3">
         {isLoading && (
           <div className="text-center py-12 text-gray-500">Loading report…</div>
@@ -178,6 +103,7 @@ export default function ReportDetails() {
           </div>
         )}
 
+        {/* Report Main Content */}
         {report && (
           <>
             {/* Attendance Table */}
@@ -199,6 +125,7 @@ export default function ReportDetails() {
         )}
       </div>
 
+      {/* Attendance Toggle Modal */}
       {selectedStudent && (
         <AttendanceToggleModal
           student={selectedStudent}

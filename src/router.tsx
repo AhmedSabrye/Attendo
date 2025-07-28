@@ -3,7 +3,7 @@ import HomePage from "./pages/HomePage";
 import GroupsLayout from "./pages/Layouts/GroupsLayout";
 import GroupPlaceholder from "./components/GroupPlaceholder";
 import OverviewTab from "./components/overview tab/Overview";
-import ReportsList from "./components/Reports/ReportsList";
+import ReportsList from "./components/Reports/ReportsList/ReportsList";
 import ReportDetails from "./components/Reports/ReportDetails/ReportDetails";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
