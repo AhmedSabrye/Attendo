@@ -176,7 +176,6 @@ function AttendanceSheetModal({ onClose }: { onClose: () => void }) {
       {showFixModal && (
         <FixAttendanceModal
           groupStudents={activeGroupStudents ?? []}
-          absentStudents={absentStudents}
           notMatchedStudents={notMatchedStudents}
           comparison={comparison}
           setValidationReport={setValidationReport}
