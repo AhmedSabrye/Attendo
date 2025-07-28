@@ -1,14 +1,18 @@
 import { useMemo, useState, useRef } from "react";
-import { FiX, FiCheck } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import type { AttendanceRecord } from "@/utils/parse";
 import { generateValidationReport } from "@/utils/generateValidationReport";
 import type { Student } from "@/utils/api";
 import type { FinalComparisonRecord, ValidationReport } from "@/utils/parse";
 import { distance } from "fastest-levenshtein";
-import SearchInput from "./searchInput";
+import ActionButtonsFixAttendanceModal from "./ActionButtons";
+import UndoPanel from "./UndoPanel";
+import UnmatchedRecordsSection from "./UnmatchedRecordsSection";
+import AbsentStudentsSection from "./AbsentStudentsSection";
+import SearchAndSmartMatchCrontrols from "./SearchAndSmartMatchCrontrols";
+import { toast } from "react-toastify";
 
 interface FixAttendanceModalProps {
-  absentStudents: FinalComparisonRecord[];
   notMatchedStudents: AttendanceRecord[];
   comparison: FinalComparisonRecord[];
   onDone: (
@@ -22,14 +26,13 @@ interface FixAttendanceModalProps {
   durationThreshold: number;
 }
 
-interface AssignedMatch {
+export interface AssignedMatch {
   student: FinalComparisonRecord;
   unmatchedRecords: AttendanceRecord[];
   totalDuration: number;
 }
 
 function FixAttendanceModal({
-  // absentStudents,
   notMatchedStudents,
   comparison,
   onDone,
@@ -59,9 +62,6 @@ function FixAttendanceModal({
     null
   );
 
-  // New state for search inputs
-  const [absentSearch, setAbsentSearch] = useState("");
-  const [unmatchedSearch, setUnmatchedSearch] = useState("");
   // State for toggling search and smart match
   const [searchEnabled, setSearchEnabled] = useState(() => {
     const searchEnabled = localStorage.getItem("searchEnabled");
@@ -202,8 +202,6 @@ function FixAttendanceModal({
     setSelectedUnmatchedIdxs(new Set());
 
     // Clear search inputs after assign
-    setAbsentSearch("");
-    setUnmatchedSearch("");
     similarNames.current = new Set();
   };
 
@@ -250,6 +248,12 @@ function FixAttendanceModal({
   };
 
   const handleFinish = () => {
+    if (selectedStudentId != null || selectedUnmatchedIdxs.size !== 0) {
+      toast.error("Assign or unselect an unmatched records", {
+        toastId: "fix-attendance-modal",
+      });
+      return;
+    }
     onDone(localComparison, localAbsent, localUnmatched);
     const report = generateValidationReport(
       {
@@ -261,7 +265,6 @@ function FixAttendanceModal({
     );
     setValidationReport(report);
   };
-  console.log(assignedMatches);
   const reversedData = useMemo(() => {
     return [...assignedMatches].reverse(); // safe copy + reverse
   }, [assignedMatches]);
@@ -283,175 +286,34 @@ function FixAttendanceModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Controls for search and smart match */}
-          <div className="col-span-2 flex flex-wrap gap-6 mb-4 items-center">
-            <label className="flex items-center gap-2 text-sm font-medium bg-gray-100 px-3 py-1 rounded-full shadow-sm transition border border-gray-200 hover:bg-gray-200 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={searchEnabled}
-                onChange={(e) => {
-                  setSearchEnabled(e.target.checked);
-                  localStorage.setItem(
-                    "searchEnabled",
-                    e.target.checked.toString()
-                  );
-                }}
-                className="w-4 h-4 accent-blue-600 rounded focus:ring-2 focus:ring-blue-400 transition"
-                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
-              />
-              <span className="select-none">Enable Search</span>
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium bg-gray-100 px-3 py-1 rounded-full shadow-sm transition border border-gray-200 hover:bg-gray-200 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={smartMatchEnabled}
-                onChange={(e) => {
-                  setSmartMatchEnabled(e.target.checked);
-                  localStorage.setItem(
-                    "smartMatchEnabled",
-                    e.target.checked.toString()
-                  );
-                }}
-                className="w-4 h-4 accent-green-600 rounded focus:ring-2 focus:ring-green-400 transition"
-                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
-              />
-              <span className="select-none">Smart Match</span>
-            </label>
-          </div>
+          <SearchAndSmartMatchCrontrols
+            searchEnabled={searchEnabled}
+            setSearchEnabled={setSearchEnabled}
+            smartMatchEnabled={smartMatchEnabled}
+            setSmartMatchEnabled={setSmartMatchEnabled}
+          />
+
           {/* Absent Students */}
-          <div>
-            <h3 className="font-medium mb-2">
-              Absent Students ({localAbsent.length})
-            </h3>
-            {/* Search input for absent students */}
-            {searchEnabled && (
-              <SearchInput
-                search={absentSearch}
-                setSearch={setAbsentSearch}
-                placeholder="Search absent..."
-              />
-            )}
-            <div className="border rounded-lg divide-y max-h-32 md:max-h-72 overflow-y-auto">
-              {[...localAbsent]
-                .filter(
-                  (student) =>
-                    absentSearch.trim() === "" ||
-                    (student.studentName ?? "")
-                      .toLowerCase()
-                      .includes(absentSearch.toLowerCase())
-                )
-                .sort((a, b) =>
-                  (a.studentName ?? "").localeCompare(b.studentName ?? "")
-                )
-                .map((student) => (
-                  <label
-                    key={student.studentId}
-                    className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-50"
-                  >
-                    <input
-                      type="radio"
-                      name="absentStudent"
-                      value={student.studentId}
-                      checked={selectedStudentId === student.studentId}
-                      onChange={() =>
-                        handleSelectStudent(
-                          student.studentId,
-                          student.studentName ?? ""
-                        )
-                      }
-                    />
-                    <span>{student.studentName}</span>
-                    {student.duration > 0 &&
-                      student.duration < durationThreshold && (
-                        <span className="text-xs text-gray-600 ml-auto">
-                          {student.duration} mins of {durationThreshold} mins
-                        </span>
-                      )}
-                    <span className="text-xs text-gray-400 ml-auto">
-                      {student.phoneId}
-                    </span>
-                  </label>
-                ))}
-              {localAbsent.filter(
-                (student) =>
-                  absentSearch.trim() === "" ||
-                  (student.studentName ?? "")
-                    .toLowerCase()
-                    .includes(absentSearch.toLowerCase())
-              ).length === 0 && (
-                <p className="p-4 text-sm text-gray-500">
-                  No absent students found
-                </p>
-              )}
-            </div>
-          </div>
+          <AbsentStudentsSection
+            localAbsent={localAbsent}
+            searchEnabled={searchEnabled}
+            handleSelectStudent={handleSelectStudent}
+            selectedStudentId={selectedStudentId}
+            durationThreshold={durationThreshold}
+          />
 
           {/* Unmatched Records */}
-          <div>
-            <h3 className="font-medium mb-2">
-              Unmatched Records ({localUnmatched.length})
-            </h3>
-            {/* Search input for unmatched records */}
-            {searchEnabled && (
-              <SearchInput
-                search={unmatchedSearch}
-                setSearch={setUnmatchedSearch}
-                placeholder="Search unmatched..."
-              />
-            )}
-            <div className="border rounded-lg divide-y max-h-32 md:max-h-72 overflow-y-auto">
-              {localUnmatched
-                .map((rec, idx) => ({ rec, idx }))
-                .filter(
-                  ({ rec }) =>
-                    unmatchedSearch.trim() === "" ||
-                    (rec.studentName ?? "")
-                      .toLowerCase()
-                      .includes(unmatchedSearch.toLowerCase())
-                )
-                .map(({ rec, idx }) => {
-                  const isSimilar =
-                    smartMatchEnabled &&
-                    similarNames.current.has(rec.studentName ?? "");
-                  return (
-                    <label
-                      key={idx}
-                      className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-50 ${
-                        isSimilar
-                          ? "bg-yellow-100 border-l-4 border-l-yellow-500"
-                          : ""
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedUnmatchedIdxs.has(idx)}
-                        onChange={() => handleToggleUnmatched(idx)}
-                      />
-                      <span className="truncate flex-1">
-                        {rec.studentName}{" "}
-                        {rec.phoneId ? `(${rec.phoneId})` : ""}
-                      </span>
-                      <span className="text-xs text-gray-400 ml-auto">
-                        {rec.duration}m
-                      </span>
-                    </label>
-                  );
-                })}
-              {localUnmatched.filter(
-                (rec) =>
-                  unmatchedSearch.trim() === "" ||
-                  (rec.studentName ?? "")
-                    .toLowerCase()
-                    .includes(unmatchedSearch.toLowerCase())
-              ).length === 0 && (
-                <p className="p-4 text-sm text-gray-500">
-                  No unmatched records found
-                </p>
-              )}
-            </div>
-          </div>
+          <UnmatchedRecordsSection
+            localUnmatched={localUnmatched}
+            searchEnabled={searchEnabled}
+            smartMatchEnabled={smartMatchEnabled}
+            similarNames={similarNames}
+            handleToggleUnmatched={handleToggleUnmatched}
+            selectedUnmatchedIdxs={selectedUnmatchedIdxs}
+          />
         </div>
 
-        {/* Selected total */}
+        {/* Asigned Duration Indicator */}
         <p className="mt-4 text-sm min-h-6 text-emerald-600">
           {selectedStudentId != null &&
             selectedUnmatchedIdxs.size > 0 &&
@@ -464,72 +326,23 @@ function FixAttendanceModal({
             }`}
         </p>
 
-        {/* Assigned Matches Display - Column */}
+        {/* Assigned Matches Display - to undo matches */}
         {assignedMatches.length > 0 && (
-          <div className="md:absolute -top-5 right-1/2 md:translate-x-1/2 max-h-48 md:-translate-y-full w-full md:w-80 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg shadow-lg p-4 z-20">
-            <h3 className="font-medium mb-3 text-gray-800 border-b border-gray-300 pb-2">
-              Recent Assignments ({assignedMatches.length})
-            </h3>
-            <div className="space-y-2">
-              {reversedData.map((match, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 bg-white border border-green-200 rounded-lg p-3 shadow-sm"
-                >
-                  <div className="flex-1 text-sm">
-                    <div className="font-medium text-green-800 mb-1">
-                      {match.student.studentName}
-                    </div>
-                    <div className="text-gray-600 text-xs mb-1">
-                      ←{" "}
-                      {match.unmatchedRecords
-                        .map((r) => r.studentName)
-                        .join(", ")}
-                    </div>
-                    <div className="text-green-600 font-medium text-xs">
-                      {match.totalDuration} minutes
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleUndoMatch(match.student.studentId)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-1 flex-shrink-0"
-                    title="Undo this assignment"
-                  >
-                    <FiX size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+          <UndoPanel
+            assignedMatches={assignedMatches}
+            reversedData={reversedData}
+            handleUndoMatch={handleUndoMatch}
+          />
         )}
 
         {/* Actions */}
-        <div className="mt-auto flex flex-col md:flex-row md:justify-between gap-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-          <div className="flex flex-col gap-2 md:flex-row">
-            <button
-              onClick={handleAssign}
-              disabled={
-                selectedStudentId == null || selectedUnmatchedIdxs.size === 0
-              }
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 hover:bg-blue-700"
-            >
-              <FiCheck size={16} /> Assign & Next
-            </button>
-
-            <button
-              onClick={handleFinish}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
-              Done
-            </button>
-          </div>
-        </div>
+        <ActionButtonsFixAttendanceModal
+          onClose={onClose}
+          handleAssign={handleAssign}
+          handleFinish={handleFinish}
+          selectedStudentId={selectedStudentId}
+          selectedUnmatchedIdxs={selectedUnmatchedIdxs}
+        />
       </div>
     </div>
   );
