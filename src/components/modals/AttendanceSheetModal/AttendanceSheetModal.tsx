@@ -2,16 +2,13 @@ import { useState } from "react";
 import Header from "./Header";
 import UploadArea from "./UploadArea";
 import ValidationSummary from "./ValidationSummary";
+import { parseAttendanceSheet } from "@/utils/parse";
 import {
-  parseAttendanceSheet,
   generateSessionAttendanceReport,
-} from "@/utils/parse";
+  type FinalComparisonRecord,
+} from "@/utils/generateSessionAttendanceReport";
 import { generateValidationReport } from "@/utils/generateValidationReport";
-import type {
-  AttendanceRecord,
-  FinalComparisonRecord,
-  ValidationReport,
-} from "@/utils/parse";
+import type { AttendanceRecord, ValidationReport } from "@/utils/parse";
 import FixAttendanceModal from "./FixAttendanceModal/FixAttendanceModal";
 import ActionButtons from "./ActionButtons";
 import FileInfo from "./FileInfo";

@@ -1,4 +1,4 @@
-import type { FinalComparisonRecord } from "@/utils/parse";
+import type { FinalComparisonRecord } from "@/utils/generateSessionAttendanceReport";
 import SearchInput from "./searchInput";
 import { useState } from "react";
 

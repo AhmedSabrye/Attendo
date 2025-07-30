@@ -1,4 +1,5 @@
-import type { SessionReport, ValidationReport } from "./parse";
+import type { ValidationReport } from "./parse";
+import type { SessionReport } from "./generateSessionAttendanceReport";
 import type { Student } from "./api";
 
 export function generateValidationReport(
