@@ -52,7 +52,10 @@ export default function OverviewTable({
             </th>
           )}
           {sortedReports?.map((report, index) => (
-            <th className="text-center py-3 px-2 font-medium  text-gray-900 min-w-[80px] text-xs">
+            <th
+              key={report.session_id}
+              className="text-center py-3 px-2 font-medium  text-gray-900 min-w-[80px] text-xs"
+            >
               <div className="flex flex-col items-center">
                 <span className=" text-gray-600">
                   {new Date(report.date!).toLocaleDateString("en-US", {
@@ -105,7 +108,10 @@ export default function OverviewTable({
 
               {/* Attendance Rate */}
               {totalSessions > 0 && (
-                <td className="py-4  px-2 bg-white z-10 text-center flex flex-col items-center">
+                <td
+                  key={`${student.student_id}-rate`}
+                  className="py-4  px-2 bg-white z-10 text-center flex flex-col items-center"
+                >
                   <span
                     className={`text-sm font-medium ${
                       attendanceRate >= 80
@@ -142,6 +148,7 @@ export default function OverviewTable({
                 // problem just look at it and see what you got.
                 return (
                   <td
+                    key={`${student.student_id}-${report.session_id}`}
                     className="py-4 px-2 text-center cursor-pointer hover:bg-gray-100 active:bg-gray-200"
                     onDoubleClick={() => {
                       if (report.date) {
