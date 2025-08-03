@@ -9,6 +9,10 @@ import {
 } from "@/stores/api";
 import DiffIndicator from "./DiffIndicator";
 import type { Student } from "@/utils/api";
+import {
+  cleanInputInvisibleChars,
+  isSafeInput,
+} from "@/utils/validation";
 
 interface TemplateManagerProps {
   onClose: () => void;
@@ -25,8 +29,29 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const [template, setTemplate] = useState("");
   const [parsed, setParsed] = useState<ParsedStudent[]>([]);
   const [localDuplicatesIdxs, setLocalDuplicatesIdxs] = useState<string[]>([]);
+  const [error, setError] = useState<string[]>([]);
   // Current group id from route params
   const { groupId } = useParams();
+
+  function handleTemplateChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const input = e.target.value;
+    setTemplate(input);
+    if (input.length < 10) {
+      setError([]);
+      return;
+    }
+    const LINE_REGEX =
+      /^\s*(?:"([^"]+)"|([^\d\s]+(?:\s+[^\d\s]+)*))\s*([\d\u0660-\u0669\s\-\+\(\)\.]+)?\s*$/u;
+    const cleanInput = cleanInputInvisibleChars(input);
+    const lines = cleanInput.split("\n");
+    const invalidLines = lines.filter((line) => {
+      return line.length > 60 || !LINE_REGEX.test(line) || !isSafeInput(line);
+    });
+    setError(invalidLines);
+    if (lines.length > 300) {
+      setError(["Template is too long"]);
+    }
+  }
 
   // Fetch current students for this group
   const { data: allStudents = [] } = useGetStudentsQuery(
@@ -120,7 +145,7 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg max-h-[90vh] min-w-96 md:min-w-3xl overflow-y-auto mx-auto">
+    <div className="bg-white rounded-lg max-w-3xl shadow-lg max-h-[90vh] min-w-96 md:min-w-3xl overflow-y-auto mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b">
         <div>
@@ -147,17 +172,27 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
           </label>
           <textarea
             value={template}
-            onChange={(e) => setTemplate(e.target.value)}
-            onBlur={handleParsing}
             placeholder="paste your template here"
             className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+            onChange={handleTemplateChange}
+            onBlur={handleParsing}
           />
           {/* Diff indicator */}
-          <DiffIndicator parsed={parsed} diff={diff} />
+          {error.length === 0 && (
+            <DiffIndicator parsed={parsed} diff={diff} />
+          )}
+          {error.length > 0 && (
+            <div className="text-red-500 text-sm mt-2">
+              Invalid lines: {error.join(", ")}
+            </div>
+          )}
         </div>
 
         {/* Process Button */}
-        <ProcessButton handleProceed={handleProceed} />
+        <ProcessButton
+          handleProceed={handleProceed}
+          isDisabled={!template || error.length > 0}
+        />
       </div>
     </div>
   );
@@ -165,12 +200,19 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
 
 export default TemplateManager;
 
-function ProcessButton({ handleProceed }: { handleProceed: () => void }) {
+function ProcessButton({
+  handleProceed,
+  isDisabled,
+}: {
+  handleProceed: () => void;
+  isDisabled: boolean;
+}) {
   return (
     <div className="flex justify-end mt-4">
       <button
         onClick={handleProceed}
-        className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        disabled={isDisabled}
+        className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <FiCheck size={16} />
         Create & Proceed
