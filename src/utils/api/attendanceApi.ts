@@ -1,5 +1,5 @@
-import { supabase } from "../../lib/supabaseClient";
-import type { Attendance, BulkAttendanceUpdate } from "../../types/api";
+import { supabase } from "@/lib/supabaseClient";
+import type { Attendance, BulkAttendanceUpdate } from "@/types/api";
 import { handleRpcCall } from "./helpers";
 
 // ==================== ATTENDANCE MANAGEMENT ====================
@@ -54,7 +54,6 @@ export const attendanceApi = {
       throw error;
     }
   },
-
 
   async bulkUpdateAttendance(
     groupId: number,

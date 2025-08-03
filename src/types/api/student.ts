@@ -1,4 +1,4 @@
-export type Student = {
+export interface Student {
   student_id: number;
   group_id: number;
   name: string;
@@ -11,4 +11,4 @@ export type Student = {
   Groups?: { group_name: string };
   isMatched?: boolean;
   isAbsent?: boolean;
-};
+}
