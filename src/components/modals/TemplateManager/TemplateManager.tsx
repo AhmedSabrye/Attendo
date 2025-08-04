@@ -9,10 +9,7 @@ import {
 } from "@/stores/api";
 import DiffIndicator from "./DiffIndicator";
 import type { Student } from "@/utils/api";
-import {
-  cleanInputInvisibleChars,
-  isSafeInput,
-} from "@/utils/validation";
+import { cleanInputInvisibleChars, isSafeInput } from "@/utils/validation";
 
 interface TemplateManagerProps {
   onClose: () => void;
@@ -25,11 +22,17 @@ export interface OrderUpdate
     "student_id" | "name" | "phone_last_3" | "order_index"
   > {}
 
+export interface InvalidLine {
+  line: string;
+  error: string;
+  fix: string;
+}
+
 const TemplateManager = ({ onClose }: TemplateManagerProps) => {
   const [template, setTemplate] = useState("");
   const [parsed, setParsed] = useState<ParsedStudent[]>([]);
   const [localDuplicatesIdxs, setLocalDuplicatesIdxs] = useState<string[]>([]);
-  const [error, setError] = useState<string[]>([]);
+  const [error, setError] = useState<InvalidLine[]>([]);
   // Current group id from route params
   const { groupId } = useParams();
 
@@ -44,12 +47,45 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
       /^\s*(?:"([^"]+)"|([^\d\s]+(?:\s+[^\d\s]+)*))\s*([\d\u0660-\u0669\s\-\+\(\)\.]+)?\s*$/u;
     const cleanInput = cleanInputInvisibleChars(input);
     const lines = cleanInput.split("\n");
-    const invalidLines = lines.filter((line) => {
-      return line.length > 60 || !LINE_REGEX.test(line) || !isSafeInput(line);
+    const invalidLines: InvalidLine[] = [];
+
+    lines.forEach((line, index) => {
+      if (line.trim() === "") {
+        invalidLines.push({
+          line: `Line ${index + 1}: "${line}"`,
+          error: "Empty line",
+          fix: "you must remove it from google sheet, before copying",
+        });
+      } else if (line.length > 60) {
+        invalidLines.push({
+          line: `Line ${index + 1}: "${line}"`,
+          error: "Line too long",
+          fix: "Shorten the name, keep unique for you to identify",
+        });
+      } else if (!LINE_REGEX.test(line)) {
+        invalidLines.push({
+          line: `Line ${index + 1}: "${line}"`,
+          error: "Invalid format (should be: Name Phone)",
+          fix: 'Format should be "Student Name" like this "Mahmoud Elnaggar"',
+        });
+      } else if (!isSafeInput(line)) {
+        invalidLines.push({
+          line: `Line ${index + 1}: "${line}"`,
+          error: "this is not a valid input",
+          fix: "Remove any special characters, SQL keywords, or script tags from the input",
+        });
+      }
     });
+
     setError(invalidLines);
     if (lines.length > 300) {
-      setError(["Template is too long"]);
+      setError([
+        {
+          line: "Template",
+          error: "Template is too long (max 300 lines)",
+          fix: "Reduce the number of lines to 300 or less by removing excess entries",
+        },
+      ]);
     }
   }
 
@@ -178,12 +214,24 @@ const TemplateManager = ({ onClose }: TemplateManagerProps) => {
             onBlur={handleParsing}
           />
           {/* Diff indicator */}
-          {error.length === 0 && (
-            <DiffIndicator parsed={parsed} diff={diff} />
-          )}
+          {error.length === 0 && <DiffIndicator parsed={parsed} diff={diff} />}
           {error.length > 0 && (
             <div className="text-red-500 text-sm mt-2">
-              Invalid lines: {error.join(", ")}
+              <div className="font-semibold mb-1">Invalid lines found:</div>
+              <ul className="list-disc list-inside space-y-1">
+                {error.map((err, index) => (
+                  <li key={index} className="">
+                    <span className="font-medium">
+                      {err.line.slice(0, 20)}...
+                    </span>
+                    <span className="text-red-400"> - {err.error}</span>
+                    <div className="ml-4 mt-1 text-emerald-700">
+                      <span className="font-medium">How to fix: </span>
+                      {err.fix}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
