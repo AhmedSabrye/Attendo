@@ -41,12 +41,32 @@ function AttendanceSheetModal({ onClose }: { onClose: () => void }) {
     const today = new Date();
     return today.toISOString().split("T")[0]; // This gives "YYYY-MM-DD"
   });
+  function validateFileUploaded(selected: File | null) {
+    const allowedMimeTypes = [
+      "text/csv",
+      "application/csv",
+      "application/vnd.ms-excel",
+    ];
+    if (!selected) {
+      toast.error("Please upload a file");
+      return false;
+    } else if (!allowedMimeTypes.includes(selected?.type || "")) {
+      toast.error("Please upload a CSV file");
+      return false;
+    } else if (selected?.size && selected?.size > 20000) {
+      toast.error(
+        "File size is too large, please upload a smaller file, this is not a valid csv file"
+      );
+      return false;
+    }
+    return true;
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
-    if (selected) {
-      setFile(selected);
-      handleProcessCsv(selected);
+    if (validateFileUploaded(selected ?? null)) {
+      setFile(selected ?? null);
+      handleProcessCsv(selected ?? null);
     }
   };
 

@@ -11,10 +11,18 @@ const UploadArea: React.FC<UploadAreaProps> = ({ onFileSelect }) => {
       <div className="border-2 border-dashed rounded-lg p-8  text-center transition-colors border-gray-300 hover:border-gray-400">
         <FiUpload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <div className="mb-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Upload your CSV file</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Upload your CSV file
+          </h3>
           <p className="text-gray-600">Click the button to select a file.</p>
         </div>
-        <input type="file" accept=".csv" className="hidden" id="csv-upload" onChange={onFileSelect} />
+        <input
+          type="file"
+          accept=".csv"
+          className="hidden"
+          id="csv-upload"
+          onChange={onFileSelect}
+        />
         <label
           htmlFor="csv-upload"
           className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
