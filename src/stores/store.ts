@@ -12,15 +12,7 @@ export const store = configureStore({
     [attendanceApi.reducerPath]: attendanceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [
-          "persist/PERSIST",
-          "persist/REHYDRATE",
-          "persist/REGISTER",
-        ],
-      },
-    }).concat(authApi.middleware, attendanceApi.middleware),
+    getDefaultMiddleware().concat(authApi.middleware, attendanceApi.middleware),
 });
 
 setupListeners(store.dispatch);
