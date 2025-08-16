@@ -25,7 +25,14 @@ export default function LoginPage() {
       await refetch();
       navigate("/groups");
     } catch (err) {
-      setError("Invalid email or password");
+      if (err instanceof Error && err.message == "Email not confirmed") {
+        setError("Email not confirmed, kindly confirm it from your mail");
+        return;
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong, kindly contact support");
+      }
     } finally {
       setLoading(false);
     }
@@ -39,10 +46,15 @@ export default function LoginPage() {
             <HiClipboardDocumentList className="text-2xl text-white" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">Sign in to your account</h2>
+        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+          Sign in to your account
+        </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{" "}
-          <Link to="/signup" className="font-medium text-emerald-600 hover:text-emerald-500">
+          <Link
+            to="/signup"
+            className="font-medium text-emerald-600 hover:text-emerald-500"
+          >
             create a new account
           </Link>
         </p>
@@ -58,7 +70,10 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1">
@@ -76,7 +91,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative">
@@ -90,8 +108,16 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 pr-10"
                 />
-                <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <HiEyeSlash className="h-5 w-5 text-gray-400" /> : <HiEye className="h-5 w-5 text-gray-400" />}
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <HiEyeSlash className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <HiEye className="h-5 w-5 text-gray-400" />
+                  )}
                 </button>
               </div>
             </div>
