@@ -28,10 +28,8 @@ export default function LoginPage() {
       if (err instanceof Error && err.message == "Email not confirmed") {
         setError("Email not confirmed, kindly confirm it from your mail");
         return;
-      } else if (err instanceof Error) {
-        setError(err.message);
       } else {
-        setError("Something went wrong, kindly contact support");
+        setError(err.message);
       }
     } finally {
       setLoading(false);
