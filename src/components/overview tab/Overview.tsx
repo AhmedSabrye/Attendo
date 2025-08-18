@@ -1,73 +1,26 @@
-import { useState } from "react";
-import { useParams } from "react-router";
-import {
-  useGetStudentsQuery,
-  useUpdateAttendanceMutation,
-  useGetAttendanceByGroupQuery,
-  useGetAllReportsForGroupQuery,
-} from "../../stores/api";
-import type { Student } from "../../utils/api";
-
 import OverviewLegend from "./OverviewLegend";
 import OverviewPlaceholder from "./OverviewPlaceholder";
 import StatsCards from "./StatsCards";
 import AttendanceToggleModal from "../modals/AttendanceToggleModal";
 import { HashLoader } from "react-spinners";
 import OverviewTable from "./OverviewTable";
-
-export interface SelectedStudent {
-  attended: boolean;
-  student: Student;
-  sessionDate: string;
-  sessionId: number;
-}
+import { useOverview } from "./useOverview";
 
 export default function OverviewTab() {
-  const { groupId } = useParams();
-  const numericGroupId = groupId ? parseInt(groupId, 10) : undefined;
-  // Fetch data
-  const { data: allStudents, isLoading: studentsLoading } =
-    useGetStudentsQuery(numericGroupId);
-  const students = allStudents
-    ?.filter((s) => s.is_active)
-    .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
-
-  // Fetching all reports for the group
-  const { data: reports } = useGetAllReportsForGroupQuery({
-    groupId: numericGroupId ?? 0,
-    groupName: "",
-  });
-  // Fetching all attendance records for the group
-  const { data: attendance, isLoading: attendanceLoading } =
-    useGetAttendanceByGroupQuery({ groupId: numericGroupId ?? 0 });
-  const [updateAttendance, { isLoading: isUpdating }] =
-    useUpdateAttendanceMutation();
-  // Toggling individual student attendance logic
-  const [selectedStudent, setSelectedStudent] =
-    useState<SelectedStudent | null>(null);
-  function handleSelectingStudent(student: SelectedStudent) {
-    setSelectedStudent(student);
-  }
-
-  async function toggleStudentSessionStatus(selectedStudent: SelectedStudent) {
-    if (!numericGroupId) return;
-    const makePresent = !selectedStudent.attended;
-    const updates: any = { attended: makePresent };
-    if (!makePresent) updates.duration_minutes = 0;
-
-    await updateAttendance({
-      groupId: numericGroupId,
-      studentId: selectedStudent.student.student_id,
-      sessionId: selectedStudent.sessionId,
-      updates,
-    }).unwrap();
-    setSelectedStudent(null);
-  }
-
-  const totalStudents = students?.length ?? 0;
-  const totalSessions = reports?.length ?? 0;
-
-  const isLoading = studentsLoading || attendanceLoading;
+  const {
+    students,
+    attendance,
+    reports,
+    groupId,
+    totalStudents,
+    totalSessions,
+    isLoading,
+    isUpdating,
+    selectedStudent,
+    handleSelectingStudent,
+    toggleStudentSessionStatus,
+    closeModal,
+  } = useOverview();
 
   return (
     <div className="mb-10">
@@ -115,6 +68,7 @@ export default function OverviewTab() {
 
         {totalStudents > 0 && totalSessions > 0 && <OverviewLegend />}
       </div>
+
       {selectedStudent && (
         <AttendanceToggleModal
           student={{
@@ -122,7 +76,7 @@ export default function OverviewTab() {
             attended: selectedStudent.attended,
           }}
           loading={isUpdating}
-          onClose={() => setSelectedStudent(null)}
+          onClose={closeModal}
           onConfirm={() => toggleStudentSessionStatus(selectedStudent)}
         />
       )}
