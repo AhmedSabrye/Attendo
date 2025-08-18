@@ -39,7 +39,7 @@ export default function OverviewTab() {
   });
   // Fetching all attendance records for the group
   const { data: attendance, isLoading: attendanceLoading } =
-  useGetAttendanceByGroupQuery({ groupId: numericGroupId ?? 0 });
+    useGetAttendanceByGroupQuery({ groupId: numericGroupId ?? 0 });
   const [updateAttendance, { isLoading: isUpdating }] =
     useUpdateAttendanceMutation();
   // Toggling individual student attendance logic
@@ -47,6 +47,21 @@ export default function OverviewTab() {
     useState<SelectedStudent | null>(null);
   function handleSelectingStudent(student: SelectedStudent) {
     setSelectedStudent(student);
+  }
+
+  async function toggleStudentSessionStatus(selectedStudent: SelectedStudent) {
+    if (!numericGroupId) return;
+    const makePresent = !selectedStudent.attended;
+    const updates: any = { attended: makePresent };
+    if (!makePresent) updates.duration_minutes = 0;
+
+    await updateAttendance({
+      groupId: numericGroupId,
+      studentId: selectedStudent.student.student_id,
+      sessionId: selectedStudent.sessionId,
+      updates,
+    }).unwrap();
+    setSelectedStudent(null);
   }
 
   const totalStudents = students?.length ?? 0;
@@ -108,20 +123,7 @@ export default function OverviewTab() {
           }}
           loading={isUpdating}
           onClose={() => setSelectedStudent(null)}
-          onConfirm={async () => {
-            if (!numericGroupId) return;
-            const makePresent = !selectedStudent.attended;
-            const updates: any = { attended: makePresent };
-            if (!makePresent) updates.duration_minutes = 0;
-
-            await updateAttendance({
-              groupId: numericGroupId,
-              studentId: selectedStudent.student.student_id,
-              sessionId: selectedStudent.sessionId,
-              updates,
-            }).unwrap();
-            setSelectedStudent(null);
-          }}
+          onConfirm={() => toggleStudentSessionStatus(selectedStudent)}
         />
       )}
     </div>
