@@ -29,7 +29,7 @@ export default function LoginPage() {
         setError("Email not confirmed, kindly confirm it from your mail");
         return;
       } else {
-        setError(err.message);
+        setError("something went wrong, kindly contact support");
       }
     } finally {
       setLoading(false);

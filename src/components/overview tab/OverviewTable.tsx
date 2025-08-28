@@ -5,7 +5,7 @@ import {
 } from "@/utils/api";
 import { useMemo } from "react";
 import { HiCheck, HiXMark } from "react-icons/hi2";
-import type { SelectedStudent } from "./Overview";
+import type { SelectedStudent } from "./useOverview";
 
 interface OverviewTable {
   attendance: Attendance[] | undefined;
